@@ -1,0 +1,248 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="DeveloperHomes administration dashboard.">
+    <title>Admin Panel | DeveloperHomes</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/themes.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+
+    <script src="/js/app.js" defer></script>
+    <script src="/js/admin.js" defer></script>
+</head>
+
+<body class="admin-page">
+
+    <header class="site-header">
+        <nav class="navbar container" aria-label="Main navigation">
+
+            <a href="/" class="logo">
+                <span class="logo-icon">D</span>
+                <span>Developer<span class="logo-highlight">Homes</span></span>
+                <span class="role-badge admin-brand-badge">ADMIN</span>
+            </a>
+
+            <button class="menu-toggle"
+                    id="menuToggle"
+                    aria-label="Toggle navigation"
+                    aria-expanded="false">
+                ☰
+            </button>
+
+            <div class="nav-links" id="navLinks">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/dashboard.html" class="nav-link">Dashboard</a>
+                <a href="/projects.html" class="nav-link">Projects</a>
+                <a href="/community.html" class="nav-link">Community</a>
+            </div>
+
+            <div class="nav-actions">
+                <button type="button"
+                        id="logoutButton"
+                        class="btn btn-outline">
+                    Logout
+                </button>
+            </div>
+
+        </nav>
+    </header>
+
+    <main class="container admin-main">
+
+        <!-- Admin Heading -->
+        <section class="page-heading">
+            <div>
+                <span class="section-label">PLATFORM MANAGEMENT</span>
+                <h1>Administration Panel 🛡️</h1>
+                <p>
+                    Monitor DeveloperHomes and manage platform users.
+                </p>
+            </div>
+
+            <span class="role-badge" id="adminRoleBadge">
+                ADMINISTRATOR
+            </span>
+        </section>
+
+        <div id="adminMessage"
+             class="message"
+             role="alert"
+             aria-live="polite"
+             hidden>
+        </div>
+
+        <!-- Statistics -->
+        <section class="stats-grid">
+
+            <article class="stat-card">
+                <div class="stat-icon">👥</div>
+                <div>
+                    <p>Total Users</p>
+                    <h2 id="totalUsers">0</h2>
+                </div>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-icon">📁</div>
+                <div>
+                    <p>Total Projects</p>
+                    <h2 id="totalProjects">0</h2>
+                </div>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-icon">💬</div>
+                <div>
+                    <p>Total Posts</p>
+                    <h2 id="totalPosts">0</h2>
+                </div>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-icon">⌨️</div>
+                <div>
+                    <p>Code Snippets</p>
+                    <h2 id="totalSnippets">0</h2>
+                </div>
+            </article>
+
+        </section>
+
+        <!-- User Management -->
+        <section class="dashboard-panel admin-users-panel">
+
+            <div class="panel-heading">
+                <div>
+                    <h2>User Management</h2>
+                    <p>View users and manage account permissions.</p>
+                </div>
+
+                <button type="button"
+                        id="refreshUsersButton"
+                        class="btn btn-outline">
+                    ↻ Refresh
+                </button>
+            </div>
+
+            <div class="admin-toolbar">
+
+                <div class="search-box">
+                    <label for="userSearch" class="visually-hidden">
+                        Search users
+                    </label>
+
+                    <input
+                        type="search"
+                        id="userSearch"
+                        placeholder="🔍 Search username or email..."
+                    >
+                </div>
+
+                <div class="filter-group">
+                    <label for="roleFilter" class="visually-hidden">
+                        Filter by role
+                    </label>
+
+                    <select id="roleFilter">
+                        <option value="">All Roles</option>
+                        <option value="user">User</option>
+                        <option value="manager">Manager</option>
+                        <option value="owner">Owner</option>
+                    </select>
+                </div>
+
+            </div>
+
+            <div class="table-responsive">
+
+                <table class="admin-table">
+
+                    <thead>
+                        <tr>
+                            <th>User</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Joined</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+
+                    <tbody id="usersTableBody">
+
+                        <tr>
+                            <td colspan="5">
+                                Loading users...
+                            </td>
+                        </tr>
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+            <p id="usersResultsCount" class="table-footer">
+                Loading user information...
+            </p>
+
+        </section>
+
+        <!-- Admin Information -->
+        <section class="dashboard-panel admin-info-panel">
+
+            <h2>Administration Guidelines</h2>
+
+            <div class="guidelines-grid">
+
+                <div class="guideline-item">
+                    <span>🔐</span>
+                    <div>
+                        <h3>Protect Accounts</h3>
+                        <p>
+                            Only assign elevated permissions to trusted users.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="guideline-item">
+                    <span>👥</span>
+                    <div>
+                        <h3>Manage Users</h3>
+                        <p>
+                            Review account information before changing roles.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="guideline-item">
+                    <span>⚠️</span>
+                    <div>
+                        <h3>Use Deletion Carefully</h3>
+                        <p>
+                            Deleting a user also removes associated records
+                            according to the database relationships.
+                        </p>
+                    </div>
+                </div>
+
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer class="site-footer">
+        <div class="container footer-bottom">
+            <p>
+                © <span id="currentYear"></span>
+                DeveloperHomes Administration.
+            </p>
+        </div>
+    </footer>
+
+</body>
+</html>

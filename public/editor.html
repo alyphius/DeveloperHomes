@@ -1,0 +1,215 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Write, edit, and save code snippets on DeveloperHomes.">
+    <title>Code Editor | DeveloperHomes</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/themes.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+
+    <script src="/js/app.js" defer></script>
+    <script src="/js/editor.js" defer></script>
+</head>
+
+<body class="editor-page">
+
+    <!-- Navigation -->
+    <header class="site-header">
+        <nav class="navbar container" aria-label="Main navigation">
+
+            <a href="/" class="logo">
+                <span class="logo-icon">D</span>
+                <span>Developer<span class="logo-highlight">Homes</span></span>
+            </a>
+
+            <button class="menu-toggle"
+                    id="menuToggle"
+                    aria-label="Toggle navigation"
+                    aria-expanded="false">
+                ☰
+            </button>
+
+            <div class="nav-links" id="navLinks">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/projects.html" class="nav-link">Projects</a>
+                <a href="/community.html" class="nav-link">Community</a>
+                <a href="/editor.html" class="nav-link active">Editor</a>
+                <a href="/dashboard.html" class="nav-link">Dashboard</a>
+            </div>
+
+            <div class="nav-actions">
+                <button type="button"
+                        id="logoutButton"
+                        class="btn btn-outline">
+                    Logout
+                </button>
+            </div>
+
+        </nav>
+    </header>
+
+    <main class="container page-main">
+
+        <!-- Heading -->
+        <section class="page-heading">
+            <div>
+                <span class="section-label">YOUR CODING WORKSPACE</span>
+                <h1>Code Editor ⌨️</h1>
+                <p>
+                    Write code, experiment with ideas, and save your
+                    reusable code snippets.
+                </p>
+            </div>
+        </section>
+
+        <div id="editorMessage"
+             class="message"
+             role="alert"
+             aria-live="polite"
+             hidden>
+        </div>
+
+        <!-- Editor Workspace -->
+        <section class="editor-layout">
+
+            <!-- Editor Main -->
+            <div class="editor-main">
+
+                <div class="editor-toolbar">
+
+                    <div class="editor-file-info">
+                        <span class="editor-file-icon">📄</span>
+                        <input
+                            type="text"
+                            id="snippetTitle"
+                            value="My Code Snippet"
+                            maxlength="150"
+                            aria-label="Snippet title"
+                            placeholder="Snippet title"
+                        >
+                    </div>
+
+                    <div class="editor-controls">
+
+                        <label for="editorLanguage" class="visually-hidden">
+                            Programming language
+                        </label>
+
+                        <select id="editorLanguage">
+                            <option value="javascript">JavaScript</option>
+                            <option value="python">Python</option>
+                            <option value="java">Java</option>
+                            <option value="kotlin">Kotlin</option>
+                            <option value="php">PHP</option>
+                            <option value="c">C</option>
+                            <option value="cpp">C++</option>
+                            <option value="csharp">C#</option>
+                            <option value="sql">SQL</option>
+                            <option value="html">HTML</option>
+                            <option value="css">CSS</option>
+                        </select>
+
+                        <button type="button"
+                                id="copyCodeButton"
+                                class="btn btn-outline">
+                            Copy Code
+                        </button>
+
+                        <button type="button"
+                                id="saveSnippetButton"
+                                class="btn btn-primary">
+                            Save Snippet
+                        </button>
+
+                    </div>
+
+                </div>
+
+                <div class="code-editor-wrapper">
+
+                    <div class="editor-line-numbers"
+                         id="lineNumbers"
+                         aria-hidden="true">
+                        1
+                    </div>
+
+                    <label for="codeEditor" class="visually-hidden">
+                        Write your code here
+                    </label>
+
+                    <textarea
+                        id="codeEditor"
+                        class="code-editor"
+                        spellcheck="false"
+                        autocapitalize="off"
+                        autocomplete="off"
+                        autocorrect="off"
+                        wrap="off"
+                        placeholder="// Start writing your code here..."
+                        aria-label="Code editor"
+                    ></textarea>
+
+                </div>
+
+                <div class="editor-statusbar">
+                    <span id="editorStatus">Ready</span>
+                    <span id="editorLanguageStatus">JavaScript</span>
+                    <span id="editorLineCount">Lines: 1</span>
+                </div>
+
+            </div>
+
+            <!-- Sidebar -->
+            <aside class="editor-sidebar">
+
+                <section class="dashboard-panel">
+                    <div class="panel-heading">
+                        <h2>My Snippets</h2>
+                    </div>
+
+                    <p class="panel-description">
+                        Your saved code snippets.
+                    </p>
+
+                    <div id="snippetsList" class="snippets-list">
+
+                        <div class="empty-text">
+                            No saved snippets yet.
+                        </div>
+
+                    </div>
+                </section>
+
+                <section class="dashboard-panel editor-tips">
+                    <h2>Quick Tips 💡</h2>
+
+                    <ul>
+                        <li>Give every snippet a clear title.</li>
+                        <li>Select the correct programming language.</li>
+                        <li>Save useful code for later.</li>
+                        <li>Copy code when you need to reuse it.</li>
+                    </ul>
+                </section>
+
+            </aside>
+
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container footer-bottom">
+            <p>
+                © <span id="currentYear"></span>
+                DeveloperHomes. Happy coding!
+            </p>
+        </div>
+    </footer>
+
+</body>
+</html>

@@ -1,0 +1,205 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Connect with developers, share programming ideas, and discuss technology.">
+    <title>Community | DeveloperHomes</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/themes.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+
+    <script src="/js/app.js" defer></script>
+    <script src="/js/community.js" defer></script>
+</head>
+
+<body class="community-page">
+
+    <!-- Navigation -->
+    <header class="site-header">
+        <nav class="navbar container" aria-label="Main navigation">
+
+            <a href="/" class="logo">
+                <span class="logo-icon">D</span>
+                <span>Developer<span class="logo-highlight">Homes</span></span>
+            </a>
+
+            <button class="menu-toggle"
+                    id="menuToggle"
+                    aria-label="Toggle navigation"
+                    aria-expanded="false">
+                ☰
+            </button>
+
+            <div class="nav-links" id="navLinks">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/projects.html" class="nav-link">Projects</a>
+                <a href="/community.html" class="nav-link active">Community</a>
+                <a href="/editor.html" class="nav-link">Editor</a>
+                <a href="/dashboard.html" class="nav-link">Dashboard</a>
+                <a href="/profile.html" class="nav-link">Profile</a>
+            </div>
+
+            <div class="nav-actions">
+                <button type="button"
+                        id="logoutButton"
+                        class="btn btn-outline">
+                    Logout
+                </button>
+            </div>
+
+        </nav>
+    </header>
+
+    <main class="container page-main">
+
+        <!-- Heading -->
+        <section class="page-heading">
+            <div>
+                <span class="section-label">CONNECT AND SHARE</span>
+                <h1>Developer Community 🌍</h1>
+                <p>
+                    Share your ideas, ask questions, learn from others,
+                    and connect with developers.
+                </p>
+            </div>
+        </section>
+
+        <div id="communityMessage"
+             class="message"
+             role="alert"
+             aria-live="polite"
+             hidden>
+        </div>
+
+        <!-- Create Post -->
+        <section class="dashboard-panel create-post-panel">
+
+            <div class="panel-heading">
+                <div>
+                    <h2>Share Something</h2>
+                    <p>What are you working on today?</p>
+                </div>
+            </div>
+
+            <form id="postForm">
+
+                <label for="postContent" class="visually-hidden">
+                    Write your community post
+                </label>
+
+                <textarea
+                    id="postContent"
+                    name="content"
+                    rows="4"
+                    maxlength="5000"
+                    placeholder="Share a programming idea, ask a question, or tell the community about your latest project..."
+                    required
+                ></textarea>
+
+                <div class="post-form-footer">
+                    <span id="postCharacterCount">0 / 5000</span>
+
+                    <button type="submit"
+                            id="publishPostButton"
+                            class="btn btn-primary">
+                        Publish Post →
+                    </button>
+                </div>
+
+            </form>
+
+        </section>
+
+        <!-- Community Layout -->
+        <section class="community-layout">
+
+            <!-- Posts -->
+            <div class="community-feed">
+
+                <div class="feed-heading">
+                    <div>
+                        <h2>Community Feed</h2>
+                        <p>Latest posts from developers.</p>
+                    </div>
+
+                    <button type="button"
+                            id="refreshPostsButton"
+                            class="btn btn-outline">
+                        ↻ Refresh
+                    </button>
+                </div>
+
+                <div id="postsContainer" class="posts-container">
+
+                    <div class="empty-state">
+                        <div class="empty-icon">💬</div>
+                        <h3>Welcome to the Community</h3>
+                        <p>
+                            Community posts will appear here.
+                            Be the first to share something!
+                        </p>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- Sidebar -->
+            <aside class="community-sidebar">
+
+                <section class="dashboard-panel">
+                    <h2>Community Guidelines</h2>
+
+                    <ul class="guidelines-list">
+                        <li>🤝 Respect other developers.</li>
+                        <li>💡 Share helpful knowledge.</li>
+                        <li>🚫 Avoid spam and harmful content.</li>
+                        <li>📚 Keep discussions constructive.</li>
+                        <li>🔐 Protect private information.</li>
+                    </ul>
+                </section>
+
+                <section class="dashboard-panel">
+                    <h2>Developer Quote</h2>
+
+                    <blockquote class="motivation-quote">
+                        "Alone we can do so little; together we can do so much."
+                    </blockquote>
+
+                    <p class="quote-author">
+                        — Helen Keller
+                    </p>
+                </section>
+
+                <section class="dashboard-panel">
+                    <h2>Explore DeveloperHomes</h2>
+
+                    <div class="sidebar-links">
+                        <a href="/projects.html">📁 My Projects</a>
+                        <a href="/editor.html">⌨️ Code Editor</a>
+                        <a href="/profile.html">👤 My Profile</a>
+                        <a href="/dashboard.html">📊 Dashboard</a>
+                    </div>
+                </section>
+
+            </aside>
+
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container footer-bottom">
+            <p>
+                © <span id="currentYear"></span>
+                DeveloperHomes. Learn and grow together.
+            </p>
+        </div>
+    </footer>
+
+</body>
+</html>

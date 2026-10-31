@@ -1,0 +1,280 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Your DeveloperHomes dashboard.">
+    <title>Dashboard | DeveloperHomes</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/themes.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+
+    <script src="/js/app.js" defer></script>
+    <script src="/js/dashboard.js" defer></script>
+</head>
+
+<body class="dashboard-page">
+
+    <!-- Header -->
+    <header class="site-header">
+        <nav class="navbar container" aria-label="Main navigation">
+
+            <a href="/" class="logo">
+                <span class="logo-icon">D</span>
+                <span>Developer<span class="logo-highlight">Homes</span></span>
+            </a>
+
+            <button class="menu-toggle"
+                    id="menuToggle"
+                    aria-label="Toggle navigation"
+                    aria-expanded="false">
+                ☰
+            </button>
+
+            <div class="nav-links" id="navLinks">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/projects.html" class="nav-link">Projects</a>
+                <a href="/community.html" class="nav-link">Community</a>
+                <a href="/dashboard.html" class="nav-link active">Dashboard</a>
+                <a href="/profile.html" class="nav-link">Profile</a>
+            </div>
+
+            <div class="nav-actions">
+                <button type="button"
+                        id="logoutButton"
+                        class="btn btn-outline">
+                    Logout
+                </button>
+            </div>
+
+        </nav>
+    </header>
+
+    <main class="container dashboard-main">
+
+        <!-- Welcome -->
+        <section class="dashboard-welcome">
+
+            <div>
+                <span class="section-label">YOUR WORKSPACE</span>
+
+                <h1>
+                    Welcome back,
+                    <span id="dashboardUsername">Developer</span>! 👋
+                </h1>
+
+                <p>
+                    Manage your projects, share your ideas, and continue
+                    growing as a developer.
+                </p>
+            </div>
+
+            <a href="/projects.html" class="btn btn-primary">
+                + New Project
+            </a>
+
+        </section>
+
+        <div id="dashboardMessage"
+             class="message"
+             role="alert"
+             aria-live="polite"
+             hidden>
+        </div>
+
+        <!-- Statistics -->
+        <section class="stats-grid">
+
+            <article class="stat-card">
+                <div class="stat-icon">📁</div>
+                <div>
+                    <p>My Projects</p>
+                    <h2 id="projectCount">0</h2>
+                </div>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-icon">💻</div>
+                <div>
+                    <p>Code Snippets</p>
+                    <h2 id="snippetCount">0</h2>
+                </div>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-icon">📝</div>
+                <div>
+                    <p>Community Posts</p>
+                    <h2 id="postCount">0</h2>
+                </div>
+            </article>
+
+            <article class="stat-card">
+                <div class="stat-icon">🔔</div>
+                <div>
+                    <p>Notifications</p>
+                    <h2 id="notificationCount">0</h2>
+                </div>
+            </article>
+
+        </section>
+
+        <!-- Dashboard Content -->
+        <section class="dashboard-grid">
+
+            <!-- Main Column -->
+            <div class="dashboard-main-column">
+
+                <section class="dashboard-panel">
+
+                    <div class="panel-heading">
+                        <div>
+                            <h2>Recent Projects</h2>
+                            <p>Your latest development work.</p>
+                        </div>
+
+                        <a href="/projects.html" class="text-link">
+                            View All →
+                        </a>
+                    </div>
+
+                    <div id="recentProjects" class="recent-projects">
+
+                        <div class="empty-state">
+                            <div class="empty-icon">📂</div>
+                            <h3>No projects yet</h3>
+                            <p>
+                                Create your first project to get started.
+                            </p>
+                            <a href="/projects.html" class="btn btn-primary">
+                                Create Project
+                            </a>
+                        </div>
+
+                    </div>
+
+                </section>
+
+                <section class="dashboard-panel">
+
+                    <div class="panel-heading">
+                        <div>
+                            <h2>Quick Actions</h2>
+                            <p>Get things done faster.</p>
+                        </div>
+                    </div>
+
+                    <div class="quick-actions-grid">
+
+                        <a href="/projects.html" class="quick-action">
+                            <span>📁</span>
+                            <strong>Manage Projects</strong>
+                            <small>Create and organize your work</small>
+                        </a>
+
+                        <a href="/editor.html" class="quick-action">
+                            <span>⌨️</span>
+                            <strong>Code Editor</strong>
+                            <small>Work with code snippets</small>
+                        </a>
+
+                        <a href="/community.html" class="quick-action">
+                            <span>🌍</span>
+                            <strong>Community</strong>
+                            <small>Share ideas and interact</small>
+                        </a>
+
+                        <a href="/profile.html" class="quick-action">
+                            <span>👤</span>
+                            <strong>My Profile</strong>
+                            <small>Update your developer profile</small>
+                        </a>
+
+                    </div>
+
+                </section>
+
+            </div>
+
+            <!-- Sidebar -->
+            <aside class="dashboard-sidebar">
+
+                <section class="dashboard-panel profile-summary">
+
+                    <div class="panel-heading">
+                        <h2>My Account</h2>
+                    </div>
+
+                    <div class="profile-avatar" id="dashboardAvatar">
+                        👨‍💻
+                    </div>
+
+                    <h3 id="profileUsername">Developer</h3>
+
+                    <p id="profileEmail" class="profile-email">
+                        Loading account...
+                    </p>
+
+                    <span class="role-badge" id="profileRole">
+                        USER
+                    </span>
+
+                    <a href="/profile.html"
+                       class="btn btn-outline btn-full">
+                        Edit Profile
+                    </a>
+
+                </section>
+
+                <section class="dashboard-panel">
+
+                    <div class="panel-heading">
+                        <h2>Notifications</h2>
+                        <a href="/community.html" class="text-link">
+                            Community →
+                        </a>
+                    </div>
+
+                    <div id="recentNotifications"
+                         class="notification-list">
+
+                        <p class="empty-text">
+                            Your notifications will appear here.
+                        </p>
+
+                    </div>
+
+                </section>
+
+                <section class="dashboard-panel">
+                    <h2>Developer Motivation</h2>
+
+                    <blockquote class="motivation-quote">
+                        "Great things are built one line of code at a time."
+                    </blockquote>
+
+                    <p class="quote-author">
+                        — DeveloperHomes
+                    </p>
+                </section>
+
+            </aside>
+
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container footer-bottom">
+            <p>
+                © <span id="currentYear"></span>
+                DeveloperHomes. Keep building!
+            </p>
+        </div>
+    </footer>
+
+</body>
+</html>

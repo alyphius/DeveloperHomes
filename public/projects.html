@@ -1,0 +1,288 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Create and manage your programming projects on DeveloperHomes.">
+    <title>Projects | DeveloperHomes</title>
+
+    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/themes.css">
+    <link rel="stylesheet" href="/css/responsive.css">
+
+    <script src="/js/app.js" defer></script>
+    <script src="/js/projects.js" defer></script>
+</head>
+
+<body class="projects-page">
+
+    <!-- Navigation -->
+    <header class="site-header">
+        <nav class="navbar container" aria-label="Main navigation">
+
+            <a href="/" class="logo">
+                <span class="logo-icon">D</span>
+                <span>Developer<span class="logo-highlight">Homes</span></span>
+            </a>
+
+            <button class="menu-toggle"
+                    id="menuToggle"
+                    aria-label="Toggle navigation"
+                    aria-expanded="false">
+                ☰
+            </button>
+
+            <div class="nav-links" id="navLinks">
+                <a href="/" class="nav-link">Home</a>
+                <a href="/projects.html" class="nav-link active">Projects</a>
+                <a href="/community.html" class="nav-link">Community</a>
+                <a href="/dashboard.html" class="nav-link">Dashboard</a>
+                <a href="/profile.html" class="nav-link">Profile</a>
+            </div>
+
+            <div class="nav-actions">
+                <button type="button"
+                        id="logoutButton"
+                        class="btn btn-outline">
+                    Logout
+                </button>
+            </div>
+
+        </nav>
+    </header>
+
+    <main class="container page-main">
+
+        <!-- Page Heading -->
+        <section class="page-heading">
+            <div>
+                <span class="section-label">YOUR DEVELOPMENT WORKSPACE</span>
+                <h1>My Projects 📁</h1>
+                <p>
+                    Create, organize, and manage your programming projects.
+                </p>
+            </div>
+
+            <button type="button"
+                    id="showProjectForm"
+                    class="btn btn-primary">
+                + Add Project
+            </button>
+        </section>
+
+        <div id="projectsMessage"
+             class="message"
+             role="alert"
+             aria-live="polite"
+             hidden>
+        </div>
+
+        <!-- Project Form -->
+        <section class="dashboard-panel project-form-panel"
+                 id="projectFormPanel"
+                 hidden>
+
+            <div class="panel-heading">
+                <div>
+                    <h2 id="projectFormTitle">Create New Project</h2>
+                    <p>Add information about your development project.</p>
+                </div>
+
+                <button type="button"
+                        id="closeProjectForm"
+                        class="icon-button"
+                        aria-label="Close project form">
+                    ✕
+                </button>
+            </div>
+
+            <form id="projectForm" class="project-form">
+
+                <input type="hidden" id="projectId" name="projectId">
+
+                <div class="form-group">
+                    <label for="projectTitle">Project Title</label>
+
+                    <input
+                        type="text"
+                        id="projectTitle"
+                        name="title"
+                        placeholder="Example: Student Management System"
+                        maxlength="150"
+                        required
+                    >
+                </div>
+
+                <div class="form-group">
+                    <label for="projectDescription">Description</label>
+
+                    <textarea
+                        id="projectDescription"
+                        name="description"
+                        rows="5"
+                        placeholder="Describe what your project does..."
+                    ></textarea>
+                </div>
+
+                <div class="form-row">
+
+                    <div class="form-group">
+                        <label for="projectLanguage">Programming Language</label>
+
+                        <select id="projectLanguage" name="language">
+                            <option value="">Select language</option>
+                            <option value="JavaScript">JavaScript</option>
+                            <option value="Python">Python</option>
+                            <option value="Java">Java</option>
+                            <option value="Kotlin">Kotlin</option>
+                            <option value="PHP">PHP</option>
+                            <option value="C">C</option>
+                            <option value="C++">C++</option>
+                            <option value="C#">C#</option>
+                            <option value="HTML/CSS">HTML/CSS</option>
+                            <option value="SQL">SQL</option>
+                            <option value="Dart">Dart</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="projectCategory">Category</label>
+
+                        <select id="projectCategory" name="category">
+                            <option value="">Select category</option>
+                            <option value="Web Development">Web Development</option>
+                            <option value="Mobile Development">Mobile Development</option>
+                            <option value="Desktop Application">Desktop Application</option>
+                            <option value="Embedded Systems">Embedded Systems</option>
+                            <option value="Artificial Intelligence">Artificial Intelligence</option>
+                            <option value="Database">Database</option>
+                            <option value="Other">Other</option>
+                        </select>
+                    </div>
+
+                </div>
+
+                <div class="form-group">
+                    <label for="projectUrl">Project URL (Optional)</label>
+
+                    <input
+                        type="url"
+                        id="projectUrl"
+                        name="project_url"
+                        placeholder="https://github.com/username/project"
+                    >
+                </div>
+
+                <div class="form-actions">
+                    <button type="submit"
+                            id="saveProjectButton"
+                            class="btn btn-primary">
+                        Save Project
+                    </button>
+
+                    <button type="button"
+                            id="cancelProjectForm"
+                            class="btn btn-outline">
+                        Cancel
+                    </button>
+                </div>
+
+            </form>
+
+        </section>
+
+        <!-- Search and Filters -->
+        <section class="project-toolbar">
+
+            <div class="search-box">
+                <label for="projectSearch" class="visually-hidden">
+                    Search projects
+                </label>
+
+                <input
+                    type="search"
+                    id="projectSearch"
+                    placeholder="🔍 Search your projects..."
+                >
+            </div>
+
+            <div class="filter-group">
+
+                <label for="languageFilter" class="visually-hidden">
+                    Filter by programming language
+                </label>
+
+                <select id="languageFilter">
+                    <option value="">All Languages</option>
+                    <option value="JavaScript">JavaScript</option>
+                    <option value="Python">Python</option>
+                    <option value="Java">Java</option>
+                    <option value="Kotlin">Kotlin</option>
+                    <option value="PHP">PHP</option>
+                    <option value="C">C</option>
+                    <option value="C++">C++</option>
+                    <option value="C#">C#</option>
+                    <option value="Dart">Dart</option>
+                </select>
+
+                <label for="categoryFilter" class="visually-hidden">
+                    Filter by category
+                </label>
+
+                <select id="categoryFilter">
+                    <option value="">All Categories</option>
+                    <option value="Web Development">Web Development</option>
+                    <option value="Mobile Development">Mobile Development</option>
+                    <option value="Desktop Application">Desktop Application</option>
+                    <option value="Embedded Systems">Embedded Systems</option>
+                    <option value="Artificial Intelligence">Artificial Intelligence</option>
+                    <option value="Database">Database</option>
+                    <option value="Other">Other</option>
+                </select>
+
+            </div>
+
+        </section>
+
+        <!-- Project Count -->
+        <section class="project-results-heading">
+            <h2>Your Projects</h2>
+            <span id="projectResultsCount">0 projects</span>
+        </section>
+
+        <!-- Projects List -->
+        <section id="projectsGrid" class="projects-grid">
+
+            <div class="empty-state">
+                <div class="empty-icon">🚀</div>
+                <h3>Start Your First Project</h3>
+                <p>
+                    Your programming projects will appear here.
+                    Create one to get started.
+                </p>
+
+                <button type="button"
+                        id="emptyCreateProject"
+                        class="btn btn-primary">
+                    + Create Project
+                </button>
+            </div>
+
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+        <div class="container footer-bottom">
+            <p>
+                © <span id="currentYear"></span>
+                DeveloperHomes. Build something amazing.
+            </p>
+        </div>
+    </footer>
+
+</body>
+</html>
