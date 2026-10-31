@@ -1,8 +1,14 @@
+
 require("dotenv").config();
 
 const express = require("express");
 const session = require("express-session");
 const path = require("path");
+
+// Database connection
+const {
+    testDatabaseConnection
+} = require("./config/database");
 
 // Route files
 const authRoutes = require("./routes/auth");
@@ -11,33 +17,42 @@ const projectRoutes = require("./routes/projects");
 const postRoutes = require("./routes/posts");
 const userRoutes = require("./routes/users");
 
+// Initialize Express
 const app = express();
 
-// Trust proxy when deployed behind a reverse proxy
+// Trust proxy when deployed behind Render
 if (process.env.NODE_ENV === "production") {
     app.set("trust proxy", 1);
 }
 
-// Basic application settings
+// Security settings
 app.disable("x-powered-by");
 
+// Request body configuration
 app.use(express.json({ limit: "2mb" }));
-app.use(express.urlencoded({
-    extended: true,
-    limit: "2mb"
-}));
+
+app.use(
+    express.urlencoded({
+        extended: true,
+        limit: "2mb"
+    })
+);
 
 // Session configuration
 if (!process.env.SESSION_SECRET) {
-    throw new Error("SESSION_SECRET is missing from .env");
+    throw new Error("SESSION_SECRET environment variable is missing");
 }
 
 app.use(
     session({
         name: "developerhomes.sid",
+
         secret: process.env.SESSION_SECRET,
+
         resave: false,
+
         saveUninitialized: false,
+
         cookie: {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
@@ -54,21 +69,24 @@ app.use("/api/projects", projectRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/users", userRoutes);
 
-// API health check
+// Health check
 app.get("/api/health", (req, res) => {
-    res.json({
+    res.status(200).json({
         success: true,
+        application: "DeveloperHomes",
         message: "DeveloperHomes server is running",
         timestamp: new Date().toISOString()
     });
 });
 
-// Serve frontend files
+// Serve frontend
 app.use(express.static(path.join(__dirname, "public")));
 
 // Main page
 app.get("/", (req, res) => {
-    res.sendFile(path.join(__dirname, "public", "index.html"));
+    res.sendFile(
+        path.join(__dirname, "public", "index.html")
+    );
 });
 
 // API 404 handler
@@ -95,15 +113,41 @@ app.use((err, req, res, next) => {
 // Start server
 const PORT = Number(process.env.PORT) || 3000;
 
-if (require.main === module) {
-    app.listen(PORT, () => {
+async function startServer() {
+    try {
         console.log("--------------------------------------");
         console.log("       DeveloperHomes Server");
         console.log("--------------------------------------");
-        console.log(`Server: http://localhost:${PORT}`);
-        console.log(`Environment: ${process.env.NODE_ENV || "development"}`);
-        console.log("--------------------------------------");
-    });
+
+        console.log("Connecting to MySQL database...");
+
+        // Verify Aiven MySQL connection before starting
+        await testDatabaseConnection();
+
+        // Start Express server
+        app.listen(PORT, "0.0.0.0", () => {
+            console.log("--------------------------------------");
+            console.log("DeveloperHomes started successfully!");
+            console.log(`Port: ${PORT}`);
+            console.log(
+                `Environment: ${process.env.NODE_ENV || "development"}`
+            );
+            console.log("--------------------------------------");
+        });
+
+    } catch (error) {
+        console.error("--------------------------------------");
+        console.error("DeveloperHomes startup failed!");
+        console.error(error.message);
+        console.error("--------------------------------------");
+
+        process.exit(1);
+    }
+}
+
+// Start only when executed directly
+if (require.main === module) {
+    startServer();
 }
 
 module.exports = app;

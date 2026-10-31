@@ -1,12 +1,26 @@
 
 const mysql = require("mysql2/promise");
+const fs = require("fs");
 require("dotenv").config();
+
+// Aiven SSL certificate
+let ssl;
+
+if (process.env.DB_SSL_CA_PATH) {
+    ssl = {
+        ca: fs.readFileSync(process.env.DB_SSL_CA_PATH, "utf8"),
+        rejectUnauthorized: true
+    };
+}
 
 const pool = mysql.createPool({
     host: process.env.DB_HOST || "localhost",
+    port: Number(process.env.DB_PORT) || 3306,
     user: process.env.DB_USER || "root",
     password: process.env.DB_PASSWORD || "",
     database: process.env.DB_NAME || "developerhomes",
+
+    ssl,
 
     waitForConnections: true,
     connectionLimit: 10,
@@ -16,19 +30,22 @@ const pool = mysql.createPool({
     timezone: "Z"
 });
 
-// Test database connection
 async function testDatabaseConnection() {
+    let connection;
+
     try {
-        const connection = await pool.getConnection();
+        connection = await pool.getConnection();
+
+        await connection.query("SELECT 1");
 
         console.log("MySQL database connected successfully!");
-
-        connection.release();
 
         return true;
     } catch (error) {
         console.error("MySQL connection failed:", error.message);
         throw error;
+    } finally {
+        if (connection) connection.release();
     }
 }
 
