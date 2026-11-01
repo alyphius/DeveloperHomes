@@ -1,3 +1,6 @@
+// =============================================
+// DeveloperHomes - Main Server
+// =============================================
 
 require("dotenv").config();
 
@@ -9,6 +12,11 @@ const path = require("path");
 const {
     testDatabaseConnection
 } = require("./config/database");
+
+// Middleware
+const {
+    requireAdmin
+} = require("./middleware/admin");
 
 // Route files
 const authRoutes = require("./routes/auth");
@@ -38,9 +46,14 @@ app.use(
     })
 );
 
-// Session configuration
+// =============================================
+// SESSION CONFIGURATION
+// =============================================
+
 if (!process.env.SESSION_SECRET) {
-    throw new Error("SESSION_SECRET environment variable is missing");
+    throw new Error(
+        "SESSION_SECRET environment variable is missing"
+    );
 }
 
 app.use(
@@ -62,14 +75,20 @@ app.use(
     })
 );
 
-// API routes
+// =============================================
+// API ROUTES
+// =============================================
+
 app.use("/api/auth", authRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/projects", projectRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/users", userRoutes);
 
-// Health check
+// =============================================
+// HEALTH CHECK
+// =============================================
+
 app.get("/api/health", (req, res) => {
     res.status(200).json({
         success: true,
@@ -79,17 +98,49 @@ app.get("/api/health", (req, res) => {
     });
 });
 
-// Serve frontend
-app.use(express.static(path.join(__dirname, "public")));
+// =============================================
+// PROTECTED OWNER / MANAGER DASHBOARD
+// IMPORTANT: This must be BEFORE express.static
+// =============================================
 
-// Main page
+app.get("/admin.html", requireAdmin, (req, res) => {
+
+    // Prevent browser caching of private admin content
+    res.set({
+        "Cache-Control": "no-store, no-cache, must-revalidate, private",
+        "Pragma": "no-cache",
+        "Expires": "0"
+    });
+
+    res.sendFile(
+        path.join(__dirname, "public", "admin.html")
+    );
+});
+
+// =============================================
+// SERVE PUBLIC FRONTEND
+// =============================================
+
+app.use(
+    express.static(
+        path.join(__dirname, "public")
+    )
+);
+
+// =============================================
+// MAIN PAGE
+// =============================================
+
 app.get("/", (req, res) => {
     res.sendFile(
         path.join(__dirname, "public", "index.html")
     );
 });
 
-// API 404 handler
+// =============================================
+// API 404 HANDLER
+// =============================================
+
 app.use("/api", (req, res) => {
     res.status(404).json({
         success: false,
@@ -97,7 +148,10 @@ app.use("/api", (req, res) => {
     });
 });
 
-// General error handler
+// =============================================
+// GENERAL ERROR HANDLER
+// =============================================
+
 app.use((err, req, res, next) => {
     console.error("Server error:", err);
 
@@ -110,7 +164,10 @@ app.use((err, req, res, next) => {
     });
 });
 
-// Start server
+// =============================================
+// START SERVER
+// =============================================
+
 const PORT = Number(process.env.PORT) || 3000;
 
 async function startServer() {
@@ -121,10 +178,8 @@ async function startServer() {
 
         console.log("Connecting to MySQL database...");
 
-        // Verify Aiven MySQL connection before starting
         await testDatabaseConnection();
 
-        // Start Express server
         app.listen(PORT, "0.0.0.0", () => {
             console.log("--------------------------------------");
             console.log("DeveloperHomes started successfully!");
