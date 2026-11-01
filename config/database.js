@@ -1,34 +1,35 @@
 
 const mysql = require("mysql2/promise");
 const fs = require("fs");
-require("dotenv").config();
+const path = require("path");
 
-// Aiven SSL certificate
-let ssl;
+const config = {
+    host: process.env.DB_HOST,
+    port: Number(process.env.DB_PORT || 3306),
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
+};
 
-if (process.env.DB_SSL_CA_PATH) {
-    ssl = {
-        ca: fs.readFileSync(process.env.DB_SSL_CA_PATH, "utf8"),
-        rejectUnauthorized: true
+// Use Aiven CA certificate when available
+const caPath = path.join(
+    __dirname,
+    "..",
+    "certificates",
+    "ca.pem"
+);
+
+if (fs.existsSync(caPath)) {
+    config.ssl = {
+        rejectUnauthorized: true,
+        ca: fs.readFileSync(caPath, "utf8")
     };
 }
 
-const pool = mysql.createPool({
-    host: process.env.DB_HOST || "localhost",
-    port: Number(process.env.DB_PORT) || 3306,
-    user: process.env.DB_USER || "root",
-    password: process.env.DB_PASSWORD || "",
-    database: process.env.DB_NAME || "developerhomes",
-
-    ssl,
-
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0,
-
-    charset: "utf8mb4",
-    timezone: "Z"
-});
+const pool = mysql.createPool(config);
 
 async function testDatabaseConnection() {
     let connection;
@@ -36,16 +37,20 @@ async function testDatabaseConnection() {
     try {
         connection = await pool.getConnection();
 
-        await connection.query("SELECT 1");
+        const [rows] = await connection.query(
+            "SELECT DATABASE() AS db, VERSION() AS version"
+        );
 
-        console.log("MySQL database connected successfully!");
+        console.log("MySQL Connected Successfully!");
+        console.log("Database:", rows[0].db);
+        console.log("Version:", rows[0].version);
 
         return true;
-    } catch (error) {
-        console.error("MySQL connection failed:", error.message);
-        throw error;
+
     } finally {
-        if (connection) connection.release();
+        if (connection) {
+            connection.release();
+        }
     }
 }
 
