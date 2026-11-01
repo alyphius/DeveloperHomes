@@ -16,7 +16,10 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const message = document.getElementById("authMessage");
 
-    // Show or hide password
+    // =====================================
+    // PASSWORD VISIBILITY
+    // =====================================
+
     const togglePassword = document.getElementById("togglePassword");
 
     if (togglePassword) {
@@ -25,14 +28,20 @@ document.addEventListener("DOMContentLoaded", () => {
 
             if (!password) return;
 
-            const isPassword = password.type === "password";
-            password.type = isPassword ? "text" : "password";
-
-            togglePassword.textContent = isPassword ? "Hide" : "Show";
+            const show = password.type === "password";
+            password.type = show ? "text" : "password";
+            togglePassword.textContent = show ? "Hide" : "Show";
+            togglePassword.setAttribute(
+                "aria-label",
+                show ? "Hide password" : "Show password"
+            );
         });
     }
 
+    // =====================================
     // LOGIN
+    // =====================================
+
     const loginForm = document.getElementById("loginForm");
 
     if (loginForm) {
@@ -66,10 +75,7 @@ document.addEventListener("DOMContentLoaded", () => {
             try {
                 const result = await app.request("/api/auth/login", {
                     method: "POST",
-                    body: JSON.stringify({
-                        identifier,
-                        password
-                    })
+                    body: JSON.stringify({ identifier, password })
                 });
 
                 app.showMessage(
@@ -90,123 +96,258 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // REGISTER
+    // =====================================
+    // REGISTRATION ELEMENTS
+    // =====================================
+
     const registerForm = document.getElementById("registerForm");
 
-    if (registerForm) {
-        registerForm.addEventListener("submit", async event => {
-            event.preventDefault();
+    if (!registerForm) return;
 
-            app.clearMessage(message);
+    const usernameInput = document.getElementById("username");
+    const emailInput = document.getElementById("email");
 
-            const username = document
-                .getElementById("username")
-                .value.trim();
+    const usernameStatus = document.getElementById(
+        "usernameAvailability"
+    );
 
-            const email = document
-                .getElementById("email")
-                .value.trim();
+    const emailStatus = document.getElementById(
+        "emailAvailability"
+    );
 
-            const password = document
-                .getElementById("password")
-                .value;
+    const registerButton = document.getElementById("registerButton");
 
-            const confirmPassword = document
-                .getElementById("confirmPassword")
-                .value;
+    let usernameTimer;
+    let emailTimer;
 
-            const acceptTerms = document.getElementById("acceptTerms");
+    let usernameCheckNumber = 0;
+    let emailCheckNumber = 0;
 
-            const registerButton =
-                document.getElementById("registerButton");
+    // =====================================
+    // CHECK AVAILABILITY
+    // =====================================
 
-            if (!username || !email || !password || !confirmPassword) {
+    async function checkAvailability(field, value, statusElement) {
+        const cleanValue = value.trim();
+
+        if (!cleanValue) {
+            statusElement.textContent = "";
+            return null;
+        }
+
+        const checkNumber = field === "username"
+            ? ++usernameCheckNumber
+            : ++emailCheckNumber;
+
+        statusElement.textContent = "Checking...";
+        statusElement.style.color = "gray";
+
+        try {
+            const query = new URLSearchParams({
+                [field]: cleanValue
+            });
+
+            const result = await app.request(
+                `/api/auth/check-availability?${query.toString()}`
+            );
+
+            // Ignore outdated responses
+            const latestNumber = field === "username"
+                ? usernameCheckNumber
+                : emailCheckNumber;
+
+            if (checkNumber !== latestNumber) return null;
+
+            const status = result[field];
+
+            if (!status) {
+                statusElement.textContent = "Could not check availability.";
+                statusElement.style.color = "gray";
+                return null;
+            }
+
+            statusElement.textContent = status.message;
+            statusElement.style.color = status.available
+                ? "green"
+                : "crimson";
+
+            return status.available;
+
+        } catch (error) {
+            statusElement.textContent = "Check failed. Please try again.";
+            statusElement.style.color = "crimson";
+            return null;
+        }
+    }
+
+    // =====================================
+    // LIVE USERNAME CHECK
+    // =====================================
+
+    usernameInput.addEventListener("input", () => {
+        clearTimeout(usernameTimer);
+        usernameCheckNumber++;
+
+        usernameStatus.textContent = "Waiting...";
+        usernameStatus.style.color = "gray";
+
+        usernameTimer = setTimeout(() => {
+            checkAvailability(
+                "username",
+                usernameInput.value,
+                usernameStatus
+            );
+        }, 500);
+    });
+
+    // =====================================
+    // LIVE EMAIL CHECK
+    // =====================================
+
+    emailInput.addEventListener("input", () => {
+        clearTimeout(emailTimer);
+        emailCheckNumber++;
+
+        emailStatus.textContent = "Waiting...";
+        emailStatus.style.color = "gray";
+
+        emailTimer = setTimeout(() => {
+            checkAvailability(
+                "email",
+                emailInput.value,
+                emailStatus
+            );
+        }, 500);
+    });
+
+    // =====================================
+    // REGISTER
+    // =====================================
+
+    registerForm.addEventListener("submit", async event => {
+        event.preventDefault();
+
+        app.clearMessage(message);
+
+        const username = usernameInput.value.trim();
+        const email = emailInput.value.trim().toLowerCase();
+
+        const password = document.getElementById("password").value;
+        const confirmPassword = document.getElementById("confirmPassword").value;
+        const acceptTerms = document.getElementById("acceptTerms");
+
+        if (!username || !email || !password || !confirmPassword) {
+            app.showMessage(
+                message,
+                "Please complete all required fields.",
+                "error"
+            );
+            return;
+        }
+
+        if (!/^[a-zA-Z0-9_]{3,50}$/.test(username)) {
+            app.showMessage(
+                message,
+                "Username must be 3–50 characters and contain only letters, numbers, and underscores.",
+                "error"
+            );
+            return;
+        }
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            app.showMessage(
+                message,
+                "Please enter a valid email address.",
+                "error"
+            );
+            return;
+        }
+
+        if (password.length < 8) {
+            app.showMessage(
+                message,
+                "Password must contain at least 8 characters.",
+                "error"
+            );
+            return;
+        }
+
+        if (password !== confirmPassword) {
+            app.showMessage(
+                message,
+                "Passwords do not match.",
+                "error"
+            );
+            return;
+        }
+
+        if (!acceptTerms.checked) {
+            app.showMessage(
+                message,
+                "Please accept the terms before registering.",
+                "error"
+            );
+            return;
+        }
+
+        registerButton.disabled = true;
+        registerButton.textContent = "Checking availability...";
+
+        try {
+            const usernameAvailable = await checkAvailability(
+                "username",
+                username,
+                usernameStatus
+            );
+
+            const emailAvailable = await checkAvailability(
+                "email",
+                email,
+                emailStatus
+            );
+
+            if (usernameAvailable !== true || emailAvailable !== true) {
                 app.showMessage(
                     message,
-                    "Please complete all required fields.",
+                    "Please use an available username and email address.",
                     "error"
                 );
                 return;
             }
 
-            if (!/^[a-zA-Z0-9_]{3,50}$/.test(username)) {
-                app.showMessage(
-                    message,
-                    "Username must be 3–50 characters and contain only letters, numbers, and underscores.",
-                    "error"
-                );
-                return;
-            }
-
-            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                app.showMessage(
-                    message,
-                    "Please enter a valid email address.",
-                    "error"
-                );
-                return;
-            }
-
-            if (password.length < 8) {
-                app.showMessage(
-                    message,
-                    "Password must contain at least 8 characters.",
-                    "error"
-                );
-                return;
-            }
-
-            if (password !== confirmPassword) {
-                app.showMessage(
-                    message,
-                    "Passwords do not match.",
-                    "error"
-                );
-                return;
-            }
-
-            if (acceptTerms && !acceptTerms.checked) {
-                app.showMessage(
-                    message,
-                    "Please accept the terms before registering.",
-                    "error"
-                );
-                return;
-            }
-
-            registerButton.disabled = true;
             registerButton.textContent = "Creating account...";
 
-            try {
-                const result = await app.request("/api/auth/register", {
-                    method: "POST",
-                    body: JSON.stringify({
-                        username,
-                        email,
-                        password
-                    })
-                });
+            const result = await app.request("/api/auth/register", {
+                method: "POST",
+                body: JSON.stringify({
+                    username,
+                    email,
+                    password
+                })
+            });
 
-                app.showMessage(
-                    message,
-                    result.message || "Account created successfully! You can now sign in.",
-                    "success"
-                );
+            app.showMessage(
+                message,
+                result.message || "Account created successfully!",
+                "success"
+            );
 
-                registerForm.reset();
+            registerForm.reset();
 
-                setTimeout(() => {
-                    window.location.href = "/login.html";
-                }, 1200);
+            usernameStatus.textContent = "";
+            emailStatus.textContent = "";
 
-            } catch (error) {
-                app.showMessage(message, error.message, "error");
+            setTimeout(() => {
+                window.location.href = "/login.html";
+            }, 1200);
 
-            } finally {
-                registerButton.disabled = false;
-                registerButton.textContent = "Create Account";
-            }
-        });
-    }
+        } catch (error) {
+            app.showMessage(message, error.message, "error");
+
+        } finally {
+            registerButton.disabled = false;
+            registerButton.textContent = "Create My Account →";
+        }
+    });
 
 });
