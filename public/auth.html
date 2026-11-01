@@ -4,7 +4,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DeveloperHomes | Welcome</title>
+    <meta name="theme-color" content="#10172a">
+
+    <title>DeveloperHomes | Authentication</title>
 
     <style>
         * {
@@ -16,29 +18,29 @@
         body {
             min-height: 100vh;
             display: flex;
-            align-items: center;
             justify-content: center;
+            align-items: center;
             padding: 25px;
             font-family: Arial, sans-serif;
-            background: linear-gradient(135deg, #10172a, #172554, #312e81);
             color: white;
+            background: linear-gradient(135deg, #0f172a, #172554, #312e81);
         }
 
         .container {
             width: 100%;
-            max-width: 440px;
+            max-width: 450px;
             padding: 35px;
-            border: 1px solid rgba(255,255,255,.15);
             border-radius: 22px;
+            border: 1px solid rgba(255,255,255,.15);
             background: rgba(255,255,255,.09);
-            backdrop-filter: blur(18px);
+            backdrop-filter: blur(20px);
             box-shadow: 0 20px 60px rgba(0,0,0,.3);
         }
 
         .logo {
             text-align: center;
             font-size: 30px;
-            font-weight: bold;
+            font-weight: 800;
             margin-bottom: 10px;
         }
 
@@ -49,28 +51,28 @@
         .subtitle {
             text-align: center;
             color: #cbd5e1;
-            margin-bottom: 25px;
             font-size: 14px;
+            margin-bottom: 25px;
         }
 
         .tabs {
             display: flex;
+            gap: 6px;
             padding: 5px;
-            gap: 5px;
             border-radius: 12px;
-            background: rgba(0,0,0,.2);
+            background: rgba(0,0,0,.25);
             margin-bottom: 25px;
         }
 
         .tab {
             flex: 1;
-            border: none;
             padding: 13px;
+            border: none;
             border-radius: 9px;
-            cursor: pointer;
             background: transparent;
             color: #cbd5e1;
             font-weight: bold;
+            cursor: pointer;
         }
 
         .tab.active {
@@ -87,8 +89,8 @@
         }
 
         h2 {
-            margin-bottom: 20px;
             font-size: 23px;
+            margin-bottom: 20px;
         }
 
         label {
@@ -104,13 +106,14 @@
             border: 1px solid rgba(255,255,255,.2);
             border-radius: 10px;
             outline: none;
-            background: rgba(15,23,42,.7);
+            background: rgba(15,23,42,.75);
             color: white;
             font-size: 15px;
         }
 
         input:focus {
             border-color: #60a5fa;
+            box-shadow: 0 0 0 2px rgba(96,165,250,.15);
         }
 
         input::placeholder {
@@ -127,7 +130,7 @@
         .submit {
             width: 100%;
             padding: 15px;
-            margin-top: 23px;
+            margin-top: 22px;
             border: none;
             border-radius: 10px;
             background: linear-gradient(90deg, #2563eb, #7c3aed);
@@ -135,18 +138,25 @@
             font-size: 16px;
             font-weight: bold;
             cursor: pointer;
+            transition: .2s;
+        }
+
+        .submit:hover {
+            transform: translateY(-2px);
+            filter: brightness(1.1);
         }
 
         .submit:disabled {
             opacity: .6;
             cursor: not-allowed;
+            transform: none;
         }
 
         .message {
-            margin-top: 15px;
-            padding: 11px;
-            border-radius: 8px;
             display: none;
+            margin-top: 15px;
+            padding: 12px;
+            border-radius: 9px;
             font-size: 13px;
             line-height: 1.5;
         }
@@ -165,8 +175,8 @@
 
         .footer {
             text-align: center;
-            color: #94a3b8;
             margin-top: 25px;
+            color: #94a3b8;
             font-size: 12px;
         }
 
@@ -182,37 +192,46 @@
 
 <div class="container">
 
-    <div class="logo">Developer<span>Homes</span></div>
+    <div class="logo">
+        Developer<span>Homes</span>
+    </div>
 
     <p class="subtitle">
         Connect. Build. Learn. Grow together.
     </p>
 
+    <!-- LOGIN / REGISTER TABS -->
     <div class="tabs">
-        <button class="tab active" id="loginTab" type="button">
+        <button type="button" class="tab active" id="loginTab">
             Login
         </button>
 
-        <button class="tab" id="registerTab" type="button">
+        <button type="button" class="tab" id="registerTab">
             Register
         </button>
     </div>
 
-    <!-- LOGIN FORM -->
+    <!-- LOGIN -->
     <form id="loginForm" class="form active">
 
         <h2>Welcome Back 👋</h2>
 
-        <label for="loginEmail">Email</label>
+        <label for="loginIdentifier">
+            Username or Email
+        </label>
+
         <input
-            id="loginEmail"
-            type="email"
-            placeholder="Enter your email"
+            id="loginIdentifier"
+            type="text"
+            placeholder="Enter username or email"
             autocomplete="username"
             required
         >
 
-        <label for="loginPassword">Password</label>
+        <label for="loginPassword">
+            Password
+        </label>
+
         <input
             id="loginPassword"
             type="password"
@@ -221,64 +240,80 @@
             required
         >
 
-        <button class="submit" type="submit">
+        <button type="submit" class="submit">
             Login to DeveloperHomes
         </button>
 
         <div id="loginMessage" class="message"></div>
+
     </form>
 
-    <!-- REGISTER FORM -->
+    <!-- REGISTER -->
     <form id="registerForm" class="form">
 
-        <h2>Create Your Account 🚀</h2>
+        <h2>Create Account 🚀</h2>
 
-        <label for="regUsername">Username</label>
+        <label for="regUsername">
+            Username
+        </label>
+
         <input
             id="regUsername"
             type="text"
-            placeholder="Choose a username"
-            autocomplete="username"
+            placeholder="Choose username"
             minlength="3"
             maxlength="50"
+            autocomplete="username"
             required
         >
+
         <small id="usernameStatus" class="status"></small>
 
-        <label for="regEmail">Email</label>
+        <label for="regEmail">
+            Email
+        </label>
+
         <input
             id="regEmail"
             type="email"
-            placeholder="Enter your email"
+            placeholder="Enter email address"
             autocomplete="email"
             required
         >
+
         <small id="emailStatus" class="status"></small>
 
-        <label for="regPassword">Password</label>
+        <label for="regPassword">
+            Password
+        </label>
+
         <input
             id="regPassword"
             type="password"
-            placeholder="Create a password"
-            autocomplete="new-password"
+            placeholder="Create password (8+ characters)"
             minlength="8"
+            autocomplete="new-password"
             required
         >
 
-        <label for="confirmPassword">Confirm Password</label>
+        <label for="confirmPassword">
+            Confirm Password
+        </label>
+
         <input
             id="confirmPassword"
             type="password"
-            placeholder="Confirm your password"
+            placeholder="Confirm password"
             autocomplete="new-password"
             required
         >
 
-        <button class="submit" type="submit">
+        <button type="submit" class="submit">
             Create Account
         </button>
 
         <div id="registerMessage" class="message"></div>
+
     </form>
 
     <div class="footer">
@@ -288,13 +323,27 @@
 </div>
 
 <script>
+
+// =====================================
+// ELEMENTS
+// =====================================
+
 const loginTab = document.getElementById("loginTab");
 const registerTab = document.getElementById("registerTab");
 
 const loginForm = document.getElementById("loginForm");
 const registerForm = document.getElementById("registerForm");
 
+const loginMessage = document.getElementById("loginMessage");
+const registerMessage = document.getElementById("registerMessage");
+
+
+// =====================================
+// TAB SWITCHING
+// =====================================
+
 function showTab(tab) {
+
     const isLogin = tab === "login";
 
     loginTab.classList.toggle("active", isLogin);
@@ -307,22 +356,34 @@ function showTab(tab) {
 }
 
 loginTab.addEventListener("click", () => showTab("login"));
+
 registerTab.addEventListener("click", () => showTab("register"));
 
+
 function clearMessages() {
-    document.querySelectorAll(".message").forEach(el => {
-        el.className = "message";
-        el.textContent = "";
+
+    document.querySelectorAll(".message").forEach(element => {
+        element.className = "message";
+        element.textContent = "";
     });
 }
 
+
 function showMessage(id, message, type) {
+
     const element = document.getElementById(id);
+
     element.textContent = message;
     element.className = "message " + type;
 }
 
+
+// =====================================
+// API REQUEST
+// =====================================
+
 async function apiRequest(url, options = {}) {
+
     const response = await fetch(url, {
         ...options,
         credentials: "same-origin",
@@ -335,166 +396,328 @@ async function apiRequest(url, options = {}) {
     const data = await response.json().catch(() => ({}));
 
     if (!response.ok || data.success === false) {
-        throw new Error(data.message || "Something went wrong.");
+        throw new Error(data.message || "Request failed.");
     }
 
     return data;
 }
 
-// LOGIN
+
+// =====================================
+// LOGIN WITH USERNAME OR EMAIL
+// =====================================
+
 loginForm.addEventListener("submit", async function(event) {
+
     event.preventDefault();
     clearMessages();
 
+    const identifier =
+        document.getElementById("loginIdentifier").value.trim();
+
+    const password =
+        document.getElementById("loginPassword").value;
+
     const button = loginForm.querySelector(".submit");
+
     button.disabled = true;
     button.textContent = "Logging in...";
 
     try {
+
         const data = await apiRequest("/api/auth/login", {
             method: "POST",
+
             body: JSON.stringify({
-                email: document.getElementById("loginEmail").value.trim(),
-                password: document.getElementById("loginPassword").value
+                identifier: identifier,
+                password: password
             })
         });
 
-        showMessage("loginMessage", "Login successful! Redirecting...", "success");
+        if (!data.success || !data.user) {
+            throw new Error("Login response was incomplete.");
+        }
 
-        window.location.href =
-            data.redirect ||
-            (data.user && (data.user.role === "owner" || data.user.role === "manager")
-                ? "/admin.html"
-                : "/dashboard.html");
+        showMessage(
+            "loginMessage",
+            "Login successful! Redirecting...",
+            "success"
+        );
+
+        const role = data.user.role;
+
+        if (role === "owner" || role === "manager") {
+            window.location.replace("/admin.html");
+        } else {
+            window.location.replace("/dashboard.html");
+        }
 
     } catch (error) {
-        showMessage("loginMessage", error.message, "error");
-    } finally {
+
+        showMessage(
+            "loginMessage",
+            error.message,
+            "error"
+        );
+
         button.disabled = false;
         button.textContent = "Login to DeveloperHomes";
     }
+
 });
 
-// AVAILABILITY CHECK
+
+// =====================================
+// USERNAME / EMAIL AVAILABILITY
+// =====================================
+
 let usernameTimer;
 let emailTimer;
 
+let usernameAvailable = null;
+let emailAvailable = null;
+
+let usernameRequest = 0;
+let emailRequest = 0;
+
+
 async function checkAvailability(field, value, statusId) {
+
     const status = document.getElementById(statusId);
 
-    if (!value.trim()) {
-        status.textContent = "";
-        return;
-    }
+    const requestId = field === "username"
+        ? ++usernameRequest
+        : ++emailRequest;
 
     status.style.color = "#cbd5e1";
     status.textContent = "Checking...";
 
     try {
+
         const params = new URLSearchParams();
-        params.set(field, value.trim());
+
+        params.set(field, value);
 
         const data = await apiRequest(
             "/api/auth/check-availability?" + params.toString()
         );
 
-        if (data.available === true) {
-            status.style.color = "#4ade80";
-            status.textContent = "✓ Available";
-        } else if (data.available === false) {
-            status.style.color = "#f87171";
-            status.textContent = "✕ Already taken";
-        } else {
-            status.style.color = "#fbbf24";
-            status.textContent = data.message || "Could not verify availability.";
+        if (
+            requestId !== (
+                field === "username" ? usernameRequest : emailRequest
+            )
+        ) return;
+
+        const result = data[field];
+
+        if (!result) {
+            throw new Error("Availability result missing.");
         }
+
+        if (field === "username") {
+            usernameAvailable = result.available;
+        } else {
+            emailAvailable = result.available;
+        }
+
+        status.textContent = result.message;
+
+        status.style.color = result.available
+            ? "#4ade80"
+            : "#f87171";
+
     } catch (error) {
+
+        if (
+            requestId !== (
+                field === "username" ? usernameRequest : emailRequest
+            )
+        ) return;
+
+        if (field === "username") usernameAvailable = null;
+        if (field === "email") emailAvailable = null;
+
         status.style.color = "#fbbf24";
-        status.textContent = "Availability check unavailable. Try again later.";
+        status.textContent = "Could not verify. Try again.";
     }
 }
 
+
+// USERNAME INPUT
+
 document.getElementById("regUsername").addEventListener("input", function() {
+
     clearTimeout(usernameTimer);
 
+    usernameAvailable = null;
+    usernameRequest++;
+
     const value = this.value.trim();
+
     const status = document.getElementById("usernameStatus");
 
     status.textContent = "";
 
     if (value.length < 3) return;
 
+    if (!/^[a-zA-Z0-9_]{3,50}$/.test(value)) {
+        status.style.color = "#f87171";
+        status.textContent = "Use 3–50 letters, numbers or underscores.";
+        return;
+    }
+
     usernameTimer = setTimeout(() => {
         checkAvailability("username", value, "usernameStatus");
     }, 500);
+
 });
 
+
+// EMAIL INPUT
+
 document.getElementById("regEmail").addEventListener("input", function() {
+
     clearTimeout(emailTimer);
 
+    emailAvailable = null;
+    emailRequest++;
+
     const value = this.value.trim();
-    document.getElementById("emailStatus").textContent = "";
+
+    const status = document.getElementById("emailStatus");
+
+    status.textContent = "";
 
     if (!this.validity.valid || !value) return;
 
     emailTimer = setTimeout(() => {
         checkAvailability("email", value, "emailStatus");
     }, 500);
+
 });
 
-// REGISTER
+
+// =====================================
+// REGISTER NEW USER
+// =====================================
+
 registerForm.addEventListener("submit", async function(event) {
+
     event.preventDefault();
     clearMessages();
 
-    const username = document.getElementById("regUsername").value.trim();
-    const email = document.getElementById("regEmail").value.trim();
-    const password = document.getElementById("regPassword").value;
-    const confirmPassword = document.getElementById("confirmPassword").value;
+    const username =
+        document.getElementById("regUsername").value.trim();
 
-    if (password !== confirmPassword) {
-        showMessage("registerMessage", "Passwords do not match.", "error");
-        return;
-    }
+    const email =
+        document.getElementById("regEmail").value.trim();
 
-    if (password.length < 8) {
-        showMessage("registerMessage", "Password must contain at least 8 characters.", "error");
-        return;
-    }
+    const password =
+        document.getElementById("regPassword").value;
 
-    const button = registerForm.querySelector(".submit");
-    button.disabled = true;
-    button.textContent = "Creating account...";
+    const confirmPassword =
+        document.getElementById("confirmPassword").value;
 
-    try {
-        const data = await apiRequest("/api/auth/register", {
-            method: "POST",
-            body: JSON.stringify({
-                username,
-                email,
-                password
-            })
-        });
+
+    if (!/^[a-zA-Z0-9_]{3,50}$/.test(username)) {
 
         showMessage(
             "registerMessage",
-            data.message || "Account created successfully! You can now log in.",
+            "Username must contain 3–50 letters, numbers or underscores.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    if (password.length < 8) {
+
+        showMessage(
+            "registerMessage",
+            "Password must contain at least 8 characters.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    if (password !== confirmPassword) {
+
+        showMessage(
+            "registerMessage",
+            "Passwords do not match.",
+            "error"
+        );
+
+        return;
+    }
+
+
+    const button = registerForm.querySelector(".submit");
+
+    button.disabled = true;
+    button.textContent = "Creating account...";
+
+
+    try {
+
+        const data = await apiRequest("/api/auth/register", {
+
+            method: "POST",
+
+            body: JSON.stringify({
+                username: username,
+                email: email,
+                password: password
+            })
+
+        });
+
+
+        showMessage(
+            "registerMessage",
+            data.message || "Account created successfully!",
             "success"
         );
 
         registerForm.reset();
+
+        usernameAvailable = null;
+        emailAvailable = null;
+
         document.getElementById("usernameStatus").textContent = "";
         document.getElementById("emailStatus").textContent = "";
 
-        setTimeout(() => showTab("login"), 1500);
+        setTimeout(() => {
+
+            document.getElementById("loginIdentifier").value = email;
+
+            document.getElementById("loginPassword").value = "";
+
+            showTab("login");
+
+        }, 1500);
+
 
     } catch (error) {
-        showMessage("registerMessage", error.message, "error");
+
+        showMessage(
+            "registerMessage",
+            error.message,
+            "error"
+        );
+
     } finally {
+
         button.disabled = false;
         button.textContent = "Create Account";
+
     }
+
 });
+
 </script>
 
 </body>
