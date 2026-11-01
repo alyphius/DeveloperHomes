@@ -53,14 +53,11 @@
 
     <main class="container admin-main">
 
-        <!-- Admin Heading -->
         <section class="page-heading">
             <div>
                 <span class="section-label">PLATFORM MANAGEMENT</span>
                 <h1>Administration Panel 🛡️</h1>
-                <p>
-                    Monitor DeveloperHomes and manage platform users.
-                </p>
+                <p>Monitor DeveloperHomes and manage platform users.</p>
             </div>
 
             <span class="role-badge" id="adminRoleBadge">
@@ -75,7 +72,8 @@
              hidden>
         </div>
 
-        <!-- Statistics -->
+        <!-- STATISTICS -->
+
         <section class="stats-grid">
 
             <article class="stat-card">
@@ -112,7 +110,89 @@
 
         </section>
 
-        <!-- User Management -->
+        <!-- OWNER-ONLY MANAGER CREATION -->
+
+        <section class="dashboard-panel"
+                 id="managerCreationPanel"
+                 hidden>
+
+            <div class="panel-heading">
+                <div>
+                    <h2>Create Manager Account</h2>
+                    <p>Only the Owner can create Manager accounts.</p>
+                </div>
+
+                <span class="role-badge">OWNER ONLY</span>
+            </div>
+
+            <div id="managerMessage"
+                 class="message"
+                 role="alert"
+                 aria-live="polite"
+                 hidden>
+            </div>
+
+            <form id="managerForm" class="auth-form">
+
+                <div class="form-group">
+                    <label for="managerUsername">Manager Username</label>
+
+                    <input
+                        type="text"
+                        id="managerUsername"
+                        minlength="3"
+                        maxlength="50"
+                        pattern="[A-Za-z0-9_]+"
+                        autocomplete="off"
+                        placeholder="Choose manager username"
+                        required
+                    >
+
+                    <small id="managerUsernameAvailability"
+                           aria-live="polite"></small>
+                </div>
+
+                <div class="form-group">
+                    <label for="managerEmail">Manager Email</label>
+
+                    <input
+                        type="email"
+                        id="managerEmail"
+                        autocomplete="off"
+                        placeholder="manager@example.com"
+                        required
+                    >
+
+                    <small id="managerEmailAvailability"
+                           aria-live="polite"></small>
+                </div>
+
+                <div class="form-group">
+                    <label for="managerPassword">Temporary Password</label>
+
+                    <input
+                        type="password"
+                        id="managerPassword"
+                        minlength="8"
+                        autocomplete="new-password"
+                        placeholder="Create temporary password"
+                        required
+                    >
+
+                    <small>Password must contain at least 8 characters.</small>
+                </div>
+
+                <button type="submit"
+                        id="createManagerButton"
+                        class="btn btn-primary">
+                    Create Manager
+                </button>
+
+            </form>
+        </section>
+
+        <!-- USER MANAGEMENT -->
+
         <section class="dashboard-panel admin-users-panel">
 
             <div class="panel-heading">
@@ -163,6 +243,7 @@
 
                     <thead>
                         <tr>
+                            <th>ID</th>
                             <th>User</th>
                             <th>Email</th>
                             <th>Role</th>
@@ -172,13 +253,9 @@
                     </thead>
 
                     <tbody id="usersTableBody">
-
                         <tr>
-                            <td colspan="5">
-                                Loading users...
-                            </td>
+                            <td colspan="6">Loading users...</td>
                         </tr>
-
                     </tbody>
 
                 </table>
@@ -191,7 +268,8 @@
 
         </section>
 
-        <!-- Admin Information -->
+        <!-- ADMIN GUIDELINES -->
+
         <section class="dashboard-panel admin-info-panel">
 
             <h2>Administration Guidelines</h2>
@@ -202,9 +280,7 @@
                     <span>🔐</span>
                     <div>
                         <h3>Protect Accounts</h3>
-                        <p>
-                            Only assign elevated permissions to trusted users.
-                        </p>
+                        <p>Only assign elevated permissions to trusted users.</p>
                     </div>
                 </div>
 
@@ -212,9 +288,7 @@
                     <span>👥</span>
                     <div>
                         <h3>Manage Users</h3>
-                        <p>
-                            Review account information before changing roles.
-                        </p>
+                        <p>Review account information before changing roles.</p>
                     </div>
                 </div>
 
@@ -222,10 +296,7 @@
                     <span>⚠️</span>
                     <div>
                         <h3>Use Deletion Carefully</h3>
-                        <p>
-                            Deleting a user also removes associated records
-                            according to the database relationships.
-                        </p>
+                        <p>Deleting a user may remove associated records.</p>
                     </div>
                 </div>
 
