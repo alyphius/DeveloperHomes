@@ -9,11 +9,17 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const app = window.DeveloperHomes;
 
-    if (!app) return;
+    if (!app) {
+        console.error("DeveloperHomes application is not loaded.");
+        return;
+    }
 
     const message = document.getElementById("adminMessage");
 
-    // Check authentication and permissions
+    // =====================================
+    // AUTHENTICATION AND ROLE CHECK
+    // =====================================
+
     const user = await app.requireLogin();
 
     if (!user) return;
@@ -23,52 +29,41 @@ document.addEventListener("DOMContentLoaded", async () => {
         return;
     }
 
+    const isOwner = user.role === "owner";
+
     const roleBadge = document.getElementById("adminRoleBadge");
     const usersTableBody = document.getElementById("usersTableBody");
-
     const userSearch = document.getElementById("userSearch");
     const roleFilter = document.getElementById("roleFilter");
 
     let users = [];
 
-    const isOwner = user.role === "owner";
-
     if (roleBadge) {
         roleBadge.textContent = user.role.toUpperCase();
     }
 
-    // Load admin statistics
+    // =====================================
+    // LOAD STATISTICS
+    // =====================================
+
     async function loadStats() {
-
         try {
-
             const result = await app.request("/api/admin/stats");
-
             const stats = result.stats || result;
 
-            const totalUsers = document.getElementById("totalUsers");
-            const totalProjects = document.getElementById("totalProjects");
-            const totalPosts = document.getElementById("totalPosts");
-            const totalSnippets = document.getElementById("totalSnippets");
+            document.getElementById("totalUsers").textContent =
+                stats.users ?? 0;
 
-            if (totalUsers) {
-                totalUsers.textContent = stats.users ?? 0;
-            }
+            document.getElementById("totalProjects").textContent =
+                stats.projects ?? 0;
 
-            if (totalProjects) {
-                totalProjects.textContent = stats.projects ?? 0;
-            }
+            document.getElementById("totalPosts").textContent =
+                stats.posts ?? 0;
 
-            if (totalPosts) {
-                totalPosts.textContent = stats.posts ?? 0;
-            }
-
-            if (totalSnippets) {
-                totalSnippets.textContent = stats.code_snippets ?? 0;
-            }
+            document.getElementById("totalSnippets").textContent =
+                stats.snippets ?? 0;
 
         } catch (error) {
-
             app.showMessage(
                 message,
                 "Unable to load statistics: " + error.message,
@@ -77,13 +72,12 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    // Load users
+    // =====================================
+    // LOAD USERS
+    // =====================================
+
     async function loadUsers() {
-
         try {
-
-            app.clearMessage(message);
-
             const result = await app.request("/api/admin/users");
 
             users = result.users || [];
@@ -91,7 +85,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             renderUsers();
 
         } catch (error) {
-
             app.showMessage(
                 message,
                 "Unable to load users: " + error.message,
@@ -100,9 +93,11 @@ document.addEventListener("DOMContentLoaded", async () => {
         }
     }
 
-    // Render users table
-    function renderUsers() {
+    // =====================================
+    // RENDER USERS
+    // =====================================
 
+    function renderUsers() {
         if (!usersTableBody) return;
 
         const search = (userSearch?.value || "").toLowerCase();
@@ -125,41 +120,45 @@ document.addEventListener("DOMContentLoaded", async () => {
 
         if (resultsCount) {
             resultsCount.textContent =
-                `${filteredUsers.length} users`;
+                `${filteredUsers.length} users found`;
         }
 
         if (!filteredUsers.length) {
-
             usersTableBody.innerHTML = `
                 <tr>
                     <td colspan="6">No users found.</td>
                 </tr>
             `;
-
             return;
         }
 
         usersTableBody.innerHTML = filteredUsers.map(item => {
 
+            const id = Number(item.id);
+
             const isCurrentUser =
-                Number(item.id) === Number(user.id);
+                id === Number(user.id);
 
             const roleControl = isOwner
                 ? `
                     <select class="user-role-select"
                             data-action="role"
-                            data-id="${Number(item.id)}"
+                            data-id="${id}"
+                            aria-label="Change role for ${app.escapeHTML(item.username)}"
                             ${isCurrentUser ? "disabled" : ""}>
 
-                        <option value="user" ${item.role === "user" ? "selected" : ""}>
+                        <option value="user"
+                            ${item.role === "user" ? "selected" : ""}>
                             User
                         </option>
 
-                        <option value="manager" ${item.role === "manager" ? "selected" : ""}>
+                        <option value="manager"
+                            ${item.role === "manager" ? "selected" : ""}>
                             Manager
                         </option>
 
-                        <option value="owner" ${item.role === "owner" ? "selected" : ""}>
+                        <option value="owner"
+                            ${item.role === "owner" ? "selected" : ""}>
                             Owner
                         </option>
 
@@ -172,7 +171,7 @@ document.addEventListener("DOMContentLoaded", async () => {
                     <button type="button"
                             class="btn btn-danger btn-small"
                             data-action="delete"
-                            data-id="${Number(item.id)}"
+                            data-id="${id}"
                             ${isCurrentUser ? "disabled" : ""}>
                         Delete
                     </button>
@@ -180,10 +179,8 @@ document.addEventListener("DOMContentLoaded", async () => {
                 : "";
 
             return `
-
                 <tr>
-
-                    <td>${Number(item.id)}</td>
+                    <td>${id}</td>
 
                     <td>
                         <strong>${app.escapeHTML(item.username)}</strong>
@@ -202,15 +199,256 @@ document.addEventListener("DOMContentLoaded", async () => {
                             ${deleteButton}
                         </div>
                     </td>
-
                 </tr>
-
             `;
 
         }).join("");
     }
 
-    // Change user role
+    // =====================================
+    // OWNER: MANAGER CREATION
+    // =====================================
+
+    const managerPanel =
+        document.getElementById("managerCreationPanel");
+
+    const managerForm =
+        document.getElementById("managerForm");
+
+    const managerMessage =
+        document.getElementById("managerMessage");
+
+    const managerUsername =
+        document.getElementById("managerUsername");
+
+    const managerEmail =
+        document.getElementById("managerEmail");
+
+    const managerPassword =
+        document.getElementById("managerPassword");
+
+    const managerUsernameStatus =
+        document.getElementById("managerUsernameAvailability");
+
+    const managerEmailStatus =
+        document.getElementById("managerEmailAvailability");
+
+    const createManagerButton =
+        document.getElementById("createManagerButton");
+
+    if (managerPanel) {
+        managerPanel.hidden = !isOwner;
+    }
+
+    let usernameTimer;
+    let emailTimer;
+    let usernameCheckNumber = 0;
+    let emailCheckNumber = 0;
+
+    async function checkManagerAvailability(field, value, statusElement) {
+
+        const cleanValue = value.trim();
+
+        if (!cleanValue) {
+            statusElement.textContent = "";
+            return null;
+        }
+
+        const checkNumber = field === "username"
+            ? ++usernameCheckNumber
+            : ++emailCheckNumber;
+
+        statusElement.textContent = "Checking...";
+        statusElement.style.color = "gray";
+
+        try {
+            const query = new URLSearchParams({
+                [field]: cleanValue
+            });
+
+            const result = await app.request(
+                `/api/auth/check-availability?${query.toString()}`
+            );
+
+            const latestNumber = field === "username"
+                ? usernameCheckNumber
+                : emailCheckNumber;
+
+            if (checkNumber !== latestNumber) return null;
+
+            const status = result[field];
+
+            if (!status) {
+                statusElement.textContent = "Could not check availability.";
+                statusElement.style.color = "gray";
+                return null;
+            }
+
+            statusElement.textContent = status.message;
+            statusElement.style.color = status.available
+                ? "green"
+                : "crimson";
+
+            return status.available;
+
+        } catch (error) {
+            statusElement.textContent = "Availability check failed.";
+            statusElement.style.color = "crimson";
+            return null;
+        }
+    }
+
+    if (isOwner && managerUsername && managerUsernameStatus) {
+        managerUsername.addEventListener("input", () => {
+            clearTimeout(usernameTimer);
+            usernameCheckNumber++;
+
+            managerUsernameStatus.textContent = "Waiting...";
+            managerUsernameStatus.style.color = "gray";
+
+            usernameTimer = setTimeout(() => {
+                checkManagerAvailability(
+                    "username",
+                    managerUsername.value,
+                    managerUsernameStatus
+                );
+            }, 500);
+        });
+    }
+
+    if (isOwner && managerEmail && managerEmailStatus) {
+        managerEmail.addEventListener("input", () => {
+            clearTimeout(emailTimer);
+            emailCheckNumber++;
+
+            managerEmailStatus.textContent = "Waiting...";
+            managerEmailStatus.style.color = "gray";
+
+            emailTimer = setTimeout(() => {
+                checkManagerAvailability(
+                    "email",
+                    managerEmail.value,
+                    managerEmailStatus
+                );
+            }, 500);
+        });
+    }
+
+    if (isOwner && managerForm) {
+        managerForm.addEventListener("submit", async event => {
+            event.preventDefault();
+
+            app.clearMessage(managerMessage);
+
+            const username = managerUsername.value.trim();
+            const email = managerEmail.value.trim().toLowerCase();
+            const password = managerPassword.value;
+
+            if (!/^[a-zA-Z0-9_]{3,50}$/.test(username)) {
+                app.showMessage(
+                    managerMessage,
+                    "Username must contain 3–50 letters, numbers, or underscores.",
+                    "error"
+                );
+                return;
+            }
+
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                app.showMessage(
+                    managerMessage,
+                    "Please enter a valid email address.",
+                    "error"
+                );
+                return;
+            }
+
+            if (password.length < 8) {
+                app.showMessage(
+                    managerMessage,
+                    "Password must contain at least 8 characters.",
+                    "error"
+                );
+                return;
+            }
+
+            createManagerButton.disabled = true;
+            createManagerButton.textContent = "Checking...";
+
+            try {
+                const usernameAvailable =
+                    await checkManagerAvailability(
+                        "username",
+                        username,
+                        managerUsernameStatus
+                    );
+
+                const emailAvailable =
+                    await checkManagerAvailability(
+                        "email",
+                        email,
+                        managerEmailStatus
+                    );
+
+                if (
+                    usernameAvailable !== true ||
+                    emailAvailable !== true
+                ) {
+                    app.showMessage(
+                        managerMessage,
+                        "Please choose an available username and email.",
+                        "error"
+                    );
+                    return;
+                }
+
+                createManagerButton.textContent = "Creating manager...";
+
+                const result = await app.request(
+                    "/api/admin/managers",
+                    {
+                        method: "POST",
+                        body: JSON.stringify({
+                            username,
+                            email,
+                            password
+                        })
+                    }
+                );
+
+                app.showMessage(
+                    managerMessage,
+                    result.message || "Manager created successfully.",
+                    "success"
+                );
+
+                managerForm.reset();
+
+                managerUsernameStatus.textContent = "";
+                managerEmailStatus.textContent = "";
+
+                await Promise.all([
+                    loadUsers(),
+                    loadStats()
+                ]);
+
+            } catch (error) {
+                app.showMessage(
+                    managerMessage,
+                    error.message || "Could not create manager.",
+                    "error"
+                );
+
+            } finally {
+                createManagerButton.disabled = false;
+                createManagerButton.textContent = "Create Manager";
+            }
+        });
+    }
+
+    // =====================================
+    // OWNER: CHANGE USER ROLE
+    // =====================================
+
     if (usersTableBody) {
 
         usersTableBody.addEventListener("change", async event => {
@@ -246,7 +484,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             select.disabled = true;
 
             try {
-
                 const result = await app.request(
                     `/api/admin/users/${id}/role`,
                     {
@@ -264,15 +501,16 @@ document.addEventListener("DOMContentLoaded", async () => {
                 await loadUsers();
 
             } catch (error) {
-
                 app.showMessage(message, error.message, "error");
-
                 select.value = previousRole;
                 select.disabled = false;
             }
         });
 
-        // Delete user
+        // =====================================
+        // OWNER: DELETE USER
+        // =====================================
+
         usersTableBody.addEventListener("click", async event => {
 
             const button = event.target.closest(
@@ -298,7 +536,6 @@ document.addEventListener("DOMContentLoaded", async () => {
             button.disabled = true;
 
             try {
-
                 const result = await app.request(
                     `/api/admin/users/${id}`,
                     { method: "DELETE" }
@@ -316,15 +553,16 @@ document.addEventListener("DOMContentLoaded", async () => {
                 ]);
 
             } catch (error) {
-
                 app.showMessage(message, error.message, "error");
-
                 button.disabled = false;
             }
         });
     }
 
-    // Search and role filtering
+    // =====================================
+    // SEARCH AND FILTER
+    // =====================================
+
     if (userSearch) {
         userSearch.addEventListener("input", renderUsers);
     }
@@ -333,24 +571,32 @@ document.addEventListener("DOMContentLoaded", async () => {
         roleFilter.addEventListener("change", renderUsers);
     }
 
-    // Refresh button
+    // =====================================
+    // REFRESH
+    // =====================================
+
     const refreshButton =
         document.getElementById("refreshUsersButton");
 
     if (refreshButton) {
-
         refreshButton.addEventListener("click", async () => {
 
             refreshButton.disabled = true;
 
-            await Promise.all([
-                loadStats(),
-                loadUsers()
-            ]);
-
-            refreshButton.disabled = false;
+            try {
+                await Promise.all([
+                    loadStats(),
+                    loadUsers()
+                ]);
+            } finally {
+                refreshButton.disabled = false;
+            }
         });
     }
+
+    // =====================================
+    // INITIAL LOAD
+    // =====================================
 
     await Promise.all([
         loadStats(),
