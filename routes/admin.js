@@ -1,5 +1,6 @@
 
 const express = require("express");
+const bcrypt = require("bcryptjs");
 const router = express.Router();
 
 const db = require("../config/database");
@@ -43,7 +44,7 @@ router.get("/stats", requireAdmin, async (req, res) => {
 
         res.status(500).json({
             success: false,
-            message: "Failed to load admin statistics"
+            message: "Failed to load admin statistics."
         });
     }
 });
@@ -51,6 +52,7 @@ router.get("/stats", requireAdmin, async (req, res) => {
 // =====================================
 // GET ALL USERS
 // GET /api/admin/users
+// OWNER AND MANAGER
 // =====================================
 
 router.get("/users", requireAdmin, async (req, res) => {
@@ -72,7 +74,87 @@ router.get("/users", requireAdmin, async (req, res) => {
 
         res.status(500).json({
             success: false,
-            message: "Failed to load users"
+            message: "Failed to load users."
+        });
+    }
+});
+
+// =====================================
+// CREATE MANAGER
+// POST /api/admin/managers
+// OWNER ONLY
+// =====================================
+
+router.post("/managers", requireOwner, async (req, res) => {
+    try {
+        const username = String(req.body.username || "").trim();
+        const email = String(req.body.email || "").trim().toLowerCase();
+        const password = String(req.body.password || "");
+
+        if (!/^[a-zA-Z0-9_]{3,50}$/.test(username)) {
+            return res.status(400).json({
+                success: false,
+                message: "Username must be 3–50 characters using letters, numbers, and underscores."
+            });
+        }
+
+        if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            return res.status(400).json({
+                success: false,
+                message: "Please enter a valid email address."
+            });
+        }
+
+        if (password.length < 8) {
+            return res.status(400).json({
+                success: false,
+                message: "Password must contain at least 8 characters."
+            });
+        }
+
+        const [existingUsers] = await db.query(
+            `SELECT id
+             FROM users
+             WHERE username = ? OR email = ?
+             LIMIT 1`,
+            [username, email]
+        );
+
+        if (existingUsers.length > 0) {
+            return res.status(409).json({
+                success: false,
+                message: "Username or email is already registered."
+            });
+        }
+
+        const passwordHash = await bcrypt.hash(password, 12);
+
+        const [result] = await db.query(
+            `INSERT INTO users
+             (username, email, password_hash, role)
+             VALUES (?, ?, ?, 'manager')`,
+            [username, email, passwordHash]
+        );
+
+        res.status(201).json({
+            success: true,
+            message: "Manager account created successfully.",
+            userId: result.insertId
+        });
+
+    } catch (error) {
+        console.error("Manager creation error:", error);
+
+        if (error.code === "ER_DUP_ENTRY") {
+            return res.status(409).json({
+                success: false,
+                message: "Username or email is already registered."
+            });
+        }
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to create Manager account."
         });
     }
 });
@@ -83,64 +165,103 @@ router.get("/users", requireAdmin, async (req, res) => {
 // OWNER ONLY
 // =====================================
 
-router.put(
-    "/users/:id/role",
-    requireOwner,
-    async (req, res) => {
-        try {
-            const { role } = req.body;
-            const userId = Number(req.params.id);
+router.put("/users/:id/role", requireOwner, async (req, res) => {
 
-            const allowedRoles = ["user", "manager", "owner"];
+    const userId = Number(req.params.id);
+    const newRole = req.body.role;
 
-            if (!Number.isInteger(userId) || userId < 1) {
-                return res.status(400).json({
-                    success: false,
-                    message: "Invalid user ID"
-                });
-            }
+    const allowedRoles = ["user", "manager", "owner"];
 
-            if (!allowedRoles.includes(role)) {
-                return res.status(400).json({
-                    success: false,
-                    message: "Invalid role"
-                });
-            }
+    if (!Number.isInteger(userId) || userId < 1) {
+        return res.status(400).json({
+            success: false,
+            message: "Invalid user ID."
+        });
+    }
 
-            if (userId === req.session.user.id) {
-                return res.status(400).json({
-                    success: false,
-                    message: "You cannot change your own role"
-                });
-            }
+    if (!allowedRoles.includes(newRole)) {
+        return res.status(400).json({
+            success: false,
+            message: "Invalid role."
+        });
+    }
 
-            const [result] = await db.query(
-                "UPDATE users SET role = ? WHERE id = ?",
-                [role, userId]
-            );
+    if (userId === Number(req.session.user.id)) {
+        return res.status(400).json({
+            success: false,
+            message: "You cannot change your own role."
+        });
+    }
 
-            if (result.affectedRows === 0) {
-                return res.status(404).json({
-                    success: false,
-                    message: "User not found"
-                });
-            }
+    let connection;
 
-            res.json({
-                success: true,
-                message: "User role updated successfully"
-            });
+    try {
+        connection = await db.getConnection();
 
-        } catch (error) {
-            console.error("Role update error:", error);
+        await connection.beginTransaction();
 
-            res.status(500).json({
+        const [targetRows] = await connection.query(
+            "SELECT id, role FROM users WHERE id = ? FOR UPDATE",
+            [userId]
+        );
+
+        if (targetRows.length === 0) {
+            await connection.rollback();
+
+            return res.status(404).json({
                 success: false,
-                message: "Failed to update user role"
+                message: "User not found."
             });
         }
+
+        const target = targetRows[0];
+
+        if (target.role === "owner" && newRole !== "owner") {
+
+            const [owners] = await connection.query(
+                "SELECT id FROM users WHERE role = 'owner' FOR UPDATE"
+            );
+
+            if (owners.length <= 1) {
+                await connection.rollback();
+
+                return res.status(403).json({
+                    success: false,
+                    message: "You cannot demote the last Owner."
+                });
+            }
+        }
+
+        await connection.query(
+            "UPDATE users SET role = ? WHERE id = ?",
+            [newRole, userId]
+        );
+
+        await connection.commit();
+
+        res.json({
+            success: true,
+            message: "User role updated successfully."
+        });
+
+    } catch (error) {
+        if (connection) {
+            await connection.rollback();
+        }
+
+        console.error("Role update error:", error);
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to update user role."
+        });
+
+    } finally {
+        if (connection) {
+            connection.release();
+        }
     }
-);
+});
 
 // =====================================
 // DELETE USER
@@ -148,53 +269,92 @@ router.put(
 // OWNER ONLY
 // =====================================
 
-router.delete(
-    "/users/:id",
-    requireOwner,
-    async (req, res) => {
-        try {
-            const userId = Number(req.params.id);
+router.delete("/users/:id", requireOwner, async (req, res) => {
 
-            if (!Number.isInteger(userId) || userId < 1) {
-                return res.status(400).json({
-                    success: false,
-                    message: "Invalid user ID"
-                });
-            }
+    const userId = Number(req.params.id);
 
-            if (userId === req.session.user.id) {
-                return res.status(400).json({
-                    success: false,
-                    message: "You cannot delete your own account"
-                });
-            }
+    if (!Number.isInteger(userId) || userId < 1) {
+        return res.status(400).json({
+            success: false,
+            message: "Invalid user ID."
+        });
+    }
 
-            const [result] = await db.query(
-                "DELETE FROM users WHERE id = ?",
-                [userId]
-            );
+    if (userId === Number(req.session.user.id)) {
+        return res.status(400).json({
+            success: false,
+            message: "You cannot delete your own account."
+        });
+    }
 
-            if (result.affectedRows === 0) {
-                return res.status(404).json({
-                    success: false,
-                    message: "User not found"
-                });
-            }
+    let connection;
 
-            res.json({
-                success: true,
-                message: "User deleted successfully"
-            });
+    try {
+        connection = await db.getConnection();
 
-        } catch (error) {
-            console.error("Delete user error:", error);
+        await connection.beginTransaction();
 
-            res.status(500).json({
+        const [targetRows] = await connection.query(
+            "SELECT id, role FROM users WHERE id = ? FOR UPDATE",
+            [userId]
+        );
+
+        if (targetRows.length === 0) {
+            await connection.rollback();
+
+            return res.status(404).json({
                 success: false,
-                message: "Failed to delete user"
+                message: "User not found."
             });
         }
+
+        const target = targetRows[0];
+
+        if (target.role === "owner") {
+
+            const [owners] = await connection.query(
+                "SELECT id FROM users WHERE role = 'owner' FOR UPDATE"
+            );
+
+            if (owners.length <= 1) {
+                await connection.rollback();
+
+                return res.status(403).json({
+                    success: false,
+                    message: "You cannot delete the last Owner."
+                });
+            }
+        }
+
+        await connection.query(
+            "DELETE FROM users WHERE id = ?",
+            [userId]
+        );
+
+        await connection.commit();
+
+        res.json({
+            success: true,
+            message: "User deleted successfully."
+        });
+
+    } catch (error) {
+        if (connection) {
+            await connection.rollback();
+        }
+
+        console.error("Delete user error:", error);
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to delete user."
+        });
+
+    } finally {
+        if (connection) {
+            connection.release();
+        }
     }
-);
+});
 
 module.exports = router;
