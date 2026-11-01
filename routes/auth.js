@@ -19,6 +19,81 @@ function safeUser(user) {
 }
 
 // =====================================
+// CHECK USERNAME / EMAIL AVAILABILITY
+// GET /api/auth/check-availability
+// =====================================
+
+router.get("/check-availability", async (req, res) => {
+    res.set("Cache-Control", "no-store");
+
+    try {
+        const username = String(req.query.username || "").trim();
+        const email = String(req.query.email || "").trim().toLowerCase();
+
+        if (!username && !email) {
+            return res.status(400).json({
+                success: false,
+                message: "Enter a username or email."
+            });
+        }
+
+        const response = { success: true };
+
+        if (username) {
+            if (!/^[a-zA-Z0-9_]{3,50}$/.test(username)) {
+                response.username = {
+                    available: false,
+                    message: "Use 3–50 letters, numbers, or underscores."
+                };
+            } else {
+                const [rows] = await db.query(
+                    "SELECT id FROM users WHERE username = ? LIMIT 1",
+                    [username]
+                );
+
+                response.username = {
+                    available: rows.length === 0,
+                    message: rows.length === 0
+                        ? "✓ Username is available"
+                        : "✕ Username is already taken"
+                };
+            }
+        }
+
+        if (email) {
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                response.email = {
+                    available: false,
+                    message: "Enter a valid email address."
+                };
+            } else {
+                const [rows] = await db.query(
+                    "SELECT id FROM users WHERE email = ? LIMIT 1",
+                    [email]
+                );
+
+                response.email = {
+                    available: rows.length === 0,
+                    message: rows.length === 0
+                        ? "✓ Email is available"
+                        : "✕ Email is already registered"
+                };
+            }
+        }
+
+        res.json(response);
+
+    } catch (error) {
+        console.error("Availability check error:", error);
+
+        res.status(500).json({
+            success: false,
+            message: "Could not check availability."
+        });
+    }
+});
+
+// =====================================
 // REGISTER
 // POST /api/auth/register
 // =====================================
@@ -30,68 +105,59 @@ router.post("/register", async (req, res) => {
         if (!username || !email || !password) {
             return res.status(400).json({
                 success: false,
-                message: "Username, email and password are required"
+                message: "Username, email and password are required."
             });
         }
 
         const cleanUsername = String(username).trim();
         const cleanEmail = String(email).trim().toLowerCase();
 
-        if (cleanUsername.length < 3 || cleanUsername.length > 50) {
+        if (!/^[a-zA-Z0-9_]{3,50}$/.test(cleanUsername)) {
             return res.status(400).json({
                 success: false,
-                message: "Username must be between 3 and 50 characters"
-            });
-        }
-
-        if (!/^[a-zA-Z0-9_]+$/.test(cleanUsername)) {
-            return res.status(400).json({
-                success: false,
-                message: "Username can only contain letters, numbers and underscores"
+                message: "Username must be 3–50 characters and use only letters, numbers and underscores."
             });
         }
 
         if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(cleanEmail)) {
             return res.status(400).json({
                 success: false,
-                message: "Please enter a valid email address"
+                message: "Please enter a valid email address."
             });
         }
 
         if (String(password).length < 8) {
             return res.status(400).json({
                 success: false,
-                message: "Password must contain at least 8 characters"
+                message: "Password must contain at least 8 characters."
             });
         }
 
-        // Check whether username or email already exists
         const [existingUsers] = await db.query(
-            "SELECT id FROM users WHERE username = ? OR email = ?",
+            "SELECT id FROM users WHERE username = ? OR email = ? LIMIT 1",
             [cleanUsername, cleanEmail]
         );
 
         if (existingUsers.length > 0) {
             return res.status(409).json({
                 success: false,
-                message: "Username or email is already registered"
+                message: "Username or email is already registered."
             });
         }
 
-        // Hash password
         const passwordHash = await bcrypt.hash(password, 12);
 
         // Public registration always creates a normal user
         const [result] = await db.query(
             `INSERT INTO users
-            (username, email, password_hash, role)
-            VALUES (?, ?, ?, 'user')`,
+             (username, email, password_hash, role)
+             VALUES (?, ?, ?, 'user')`,
             [cleanUsername, cleanEmail, passwordHash]
         );
 
         res.status(201).json({
             success: true,
-            message: "Registration successful",
+            message: "Registration successful.",
             userId: result.insertId
         });
 
@@ -101,13 +167,13 @@ router.post("/register", async (req, res) => {
         if (error.code === "ER_DUP_ENTRY") {
             return res.status(409).json({
                 success: false,
-                message: "Username or email is already registered"
+                message: "Username or email is already registered."
             });
         }
 
         res.status(500).json({
             success: false,
-            message: "Registration failed"
+            message: "Registration failed."
         });
     }
 });
@@ -128,7 +194,7 @@ router.post("/login", async (req, res) => {
         if (!loginIdentifier || !password) {
             return res.status(400).json({
                 success: false,
-                message: "Email/username and password are required"
+                message: "Email/username and password are required."
             });
         }
 
@@ -146,7 +212,7 @@ router.post("/login", async (req, res) => {
         if (users.length === 0) {
             return res.status(401).json({
                 success: false,
-                message: "Invalid login credentials"
+                message: "Invalid login credentials."
             });
         }
 
@@ -160,36 +226,35 @@ router.post("/login", async (req, res) => {
         if (!passwordMatches) {
             return res.status(401).json({
                 success: false,
-                message: "Invalid login credentials"
+                message: "Invalid login credentials."
             });
         }
 
-        // Regenerate session after successful authentication
-        req.session.regenerate((sessionError) => {
+        req.session.regenerate(sessionError => {
             if (sessionError) {
                 console.error("Session error:", sessionError);
 
                 return res.status(500).json({
                     success: false,
-                    message: "Could not create login session"
+                    message: "Could not create login session."
                 });
             }
 
             req.session.user = safeUser(user);
 
-            req.session.save((saveError) => {
+            req.session.save(saveError => {
                 if (saveError) {
                     console.error("Session save error:", saveError);
 
                     return res.status(500).json({
                         success: false,
-                        message: "Could not save login session"
+                        message: "Could not save login session."
                     });
                 }
 
                 res.json({
                     success: true,
-                    message: "Login successful",
+                    message: "Login successful.",
                     user: req.session.user
                 });
             });
@@ -200,7 +265,7 @@ router.post("/login", async (req, res) => {
 
         res.status(500).json({
             success: false,
-            message: "Login failed"
+            message: "Login failed."
         });
     }
 });
@@ -214,7 +279,7 @@ router.get("/me", (req, res) => {
     if (!req.session || !req.session.user) {
         return res.status(401).json({
             success: false,
-            message: "Not logged in"
+            message: "Not logged in."
         });
     }
 
@@ -233,17 +298,17 @@ router.post("/logout", (req, res) => {
     if (!req.session) {
         return res.json({
             success: true,
-            message: "Already logged out"
+            message: "Already logged out."
         });
     }
 
-    req.session.destroy((error) => {
+    req.session.destroy(error => {
         if (error) {
             console.error("Logout error:", error);
 
             return res.status(500).json({
                 success: false,
-                message: "Logout failed"
+                message: "Logout failed."
             });
         }
 
@@ -255,7 +320,7 @@ router.post("/logout", (req, res) => {
 
         res.json({
             success: true,
-            message: "Logged out successfully"
+            message: "Logged out successfully."
         });
     });
 });
