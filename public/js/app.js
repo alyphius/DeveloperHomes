@@ -1,13 +1,8 @@
 
-/* =========================================
-   DEVELOPERHOMES - MAIN APPLICATION
-   ========================================= */
-
 "use strict";
 
 const DeveloperHomes = {
     apiBase: "/api",
-    currentUser: null,
 
     async request(url, options = {}) {
         const response = await fetch(url, {
@@ -36,11 +31,7 @@ const DeveloperHomes = {
 
     async getCurrentUser() {
         try {
-            const result = await this.request("/api/auth/me", {
-                method: "GET",
-                cache: "no-store"
-            });
-
+            const result = await this.request("/api/auth/me");
             return result.user || null;
         } catch {
             return null;
@@ -51,7 +42,7 @@ const DeveloperHomes = {
         const user = await this.getCurrentUser();
 
         if (!user) {
-            window.location.replace("/auth.html");
+            window.location.href = "/login.html";
             return null;
         }
 
@@ -60,7 +51,6 @@ const DeveloperHomes = {
 
     showMessage(element, message, type = "info") {
         if (!element) return;
-
         element.textContent = message;
         element.className = `message ${type}`;
         element.hidden = false;
@@ -68,19 +58,14 @@ const DeveloperHomes = {
 
     clearMessage(element) {
         if (!element) return;
-
         element.textContent = "";
         element.hidden = true;
     },
 
     formatDate(date) {
         if (!date) return "Unknown date";
-
         const value = new Date(date);
-
-        if (Number.isNaN(value.getTime())) {
-            return "Unknown date";
-        }
+        if (Number.isNaN(value.getTime())) return "Unknown date";
 
         return value.toLocaleDateString(undefined, {
             year: "numeric",
@@ -91,13 +76,8 @@ const DeveloperHomes = {
 
     formatDateTime(date) {
         if (!date) return "Unknown date";
-
         const value = new Date(date);
-
-        if (Number.isNaN(value.getTime())) {
-            return "Unknown date";
-        }
-
+        if (Number.isNaN(value.getTime())) return "Unknown date";
         return value.toLocaleString();
     },
 
@@ -110,7 +90,6 @@ const DeveloperHomes = {
                 '"': "&quot;",
                 "'": "&#039;"
             };
-
             return entities[character];
         });
     },
@@ -142,76 +121,21 @@ const DeveloperHomes = {
         }
     },
 
-    // Update navigation based on the logged-in role
-    async initAuthNavigation() {
-        const user = await this.getCurrentUser();
-        this.currentUser = user;
-
-        const navActions = document.getElementById("navActions");
-
-        // Admin controls stay hidden unless an authorized session exists.
-        const adminButton = document.getElementById("homeAdminButton");
-        const adminCard = document.getElementById("adminFeatureCard");
-
-        const role = String(user?.role || "").toLowerCase();
-        const isAdmin = role === "owner" || role === "manager";
-
-        if (adminButton) {
-            adminButton.hidden = !isAdmin;
-        }
-
-        if (adminCard) {
-            adminCard.hidden = !isAdmin;
-        }
-
-        if (!navActions) return;
-
-        if (!user) {
-            navActions.innerHTML = `
-                <a href="/auth.html" class="btn btn-outline">Login</a>
-                <a href="/register.html" class="btn btn-primary">Get Started</a>
-            `;
-            return;
-        }
-
-        navActions.innerHTML = `
-            ${isAdmin ? `
-                <a href="/admin.html"
-                   class="btn btn-primary"
-                   id="homeAdminButton">
-                    Admin
-                </a>
-            ` : ""}
-            <a href="/dashboard.html" class="btn btn-outline">
-                Dashboard
-            </a>
-            <button type="button"
-                    id="logoutButton"
-                    class="btn btn-primary">
-                Logout
-            </button>
-        `;
-    },
-
     async logout() {
         try {
             await this.request("/api/auth/logout", {
                 method: "POST"
             });
-
-            // Prevent cached protected pages from being reused.
-            window.location.replace("/auth.html");
-
         } catch (error) {
             console.error("Logout error:", error.message);
-            alert("Logout failed. Please try again.");
         }
+
+        window.location.href = "/login.html";
     },
 
     initTheme() {
         const savedTheme = localStorage.getItem("dh-theme") || "purple";
         const savedMode = localStorage.getItem("dh-mode") || "light";
-
         this.applyTheme(savedTheme, savedMode);
     },
 
@@ -219,13 +143,8 @@ const DeveloperHomes = {
         const allowedThemes = ["purple", "blue", "green", "orange"];
         const allowedModes = ["light", "dark"];
 
-        if (!allowedThemes.includes(theme)) {
-            theme = "purple";
-        }
-
-        if (!allowedModes.includes(mode)) {
-            mode = "light";
-        }
+        if (!allowedThemes.includes(theme)) theme = "purple";
+        if (!allowedModes.includes(mode)) mode = "light";
 
         document.documentElement.setAttribute("data-theme", theme);
         document.documentElement.setAttribute("data-mode", mode);
@@ -262,23 +181,56 @@ const DeveloperHomes = {
             });
         }
 
-        // Event delegation also handles dynamically created logout buttons.
-        document.addEventListener("click", event => {
-            const button = event.target.closest("#logoutButton");
-
-            if (button) {
-                event.preventDefault();
-                this.logout();
-            }
+        document.querySelectorAll("#logoutButton").forEach(button => {
+            button.addEventListener("click", () => this.logout());
         });
+    },
+
+    // Role-based homepage navigation
+    async initRoleBasedNavigation() {
+        const adminButton = document.getElementById("adminNavButton");
+        const adminFeatureCard = document.getElementById("adminFeatureCard");
+
+        const loginButton = document.getElementById("loginNavButton");
+        const registerButton = document.getElementById("registerNavButton");
+        const logoutButton = document.getElementById("logoutButton");
+
+        // Hide privileged elements by default
+        if (adminButton) adminButton.hidden = true;
+        if (adminFeatureCard) adminFeatureCard.hidden = true;
+
+        try {
+            const user = await this.getCurrentUser();
+
+            if (!user) {
+                if (logoutButton) logoutButton.hidden = true;
+                return;
+            }
+
+            // Logged-in users do not need Login/Register links
+            if (loginButton) loginButton.hidden = true;
+            if (registerButton) registerButton.hidden = true;
+            if (logoutButton) logoutButton.hidden = false;
+
+            const role = String(user.role || "").trim().toLowerCase();
+            const canAccessAdmin = ["owner", "manager"].includes(role);
+
+            if (adminButton) {
+                adminButton.hidden = !canAccessAdmin;
+            }
+
+            if (adminFeatureCard) {
+                adminFeatureCard.hidden = !canAccessAdmin;
+            }
+
+        } catch (error) {
+            console.error("Navigation role check failed:", error.message);
+        }
     },
 
     initFooter() {
         const year = document.getElementById("currentYear");
-
-        if (year) {
-            year.textContent = new Date().getFullYear();
-        }
+        if (year) year.textContent = new Date().getFullYear();
     },
 
     initThemeControls() {
@@ -295,7 +247,6 @@ const DeveloperHomes = {
         if (modeToggle) {
             modeToggle.addEventListener("change", () => {
                 const theme = localStorage.getItem("dh-theme") || "purple";
-
                 this.applyTheme(
                     theme,
                     modeToggle.checked ? "dark" : "light"
@@ -307,11 +258,10 @@ const DeveloperHomes = {
 
 window.DeveloperHomes = DeveloperHomes;
 
-document.addEventListener("DOMContentLoaded", async () => {
+document.addEventListener("DOMContentLoaded", () => {
     DeveloperHomes.initTheme();
     DeveloperHomes.initNavigation();
     DeveloperHomes.initFooter();
     DeveloperHomes.initThemeControls();
-
-    await DeveloperHomes.initAuthNavigation();
+    DeveloperHomes.initRoleBasedNavigation();
 });
