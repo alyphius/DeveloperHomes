@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="DeveloperHomes - A platform for developers to build projects, share code, and connect with other developers.">
+    <meta name="description" content="DeveloperHomes - Build, share and connect with developers.">
     <title>DeveloperHomes | Build. Share. Connect.</title>
 
     <link rel="stylesheet" href="/css/style.css">
@@ -13,6 +13,7 @@
 
     <script src="/js/app.js" defer></script>
 </head>
+
 <body>
 
 <header class="site-header">
@@ -36,17 +37,23 @@
             <a href="/dashboard.html" class="nav-link">Dashboard</a>
         </div>
 
-        <div class="nav-actions" id="navActions">
-            <a href="/auth.html" class="btn btn-outline">Login</a>
-            <a href="/register.html" class="btn btn-primary">Get Started</a>
-
-            <!-- Only Owner and Manager will see this button -->
-            <a href="/admin.html"
-               id="homeAdminButton"
-               class="btn btn-primary"
-               hidden>
-                Admin
+        <div class="nav-actions">
+            <a href="/login.html" class="btn btn-outline" id="loginNavButton">
+                Login
             </a>
+
+            <a href="/register.html" class="btn btn-primary" id="registerNavButton">
+                Get Started
+            </a>
+
+            <a href="/admin.html" class="btn btn-primary"
+               id="adminNavButton" hidden>
+                🛡️ Admin Dashboard
+            </a>
+
+            <button class="btn btn-outline" id="logoutButton" hidden>
+                Logout
+            </button>
         </div>
 
     </nav>
@@ -69,8 +76,7 @@
                 <p>
                     Welcome to DeveloperHomes, a platform where developers
                     can create projects, write and share code, learn new
-                    technologies, and connect with a growing developer
-                    community.
+                    technologies, and connect with a growing developer community.
                 </p>
 
                 <div class="hero-actions">
@@ -91,7 +97,6 @@
 
             <div class="hero-visual">
                 <div class="code-window">
-
                     <div class="code-window-header">
                         <div class="window-dots">
                             <span></span><span></span><span></span>
@@ -101,18 +106,12 @@
 
                     <div class="code-content">
                         <p><span class="code-purple">const</span> developer = {</p>
+                        <p class="code-indent">name: <span class="code-green">"Developer"</span>,</p>
+                        <p class="code-indent">passion: <span class="code-green">"Coding"</span>,</p>
                         <p class="code-indent">
-                            name: <span class="code-green">"Developer"</span>,
-                        </p>
-                        <p class="code-indent">
-                            passion: <span class="code-green">"Coding"</span>,
-                        </p>
-                        <p class="code-indent">
-                            skills: [
-                            <span class="code-green">"HTML"</span>,
+                            skills: [<span class="code-green">"HTML"</span>,
                             <span class="code-green">"CSS"</span>,
-                            <span class="code-green">"JavaScript"</span>
-                            ],
+                            <span class="code-green">"JavaScript"</span>],
                         </p>
                         <p class="code-indent">
                             goal: <span class="code-green">"Build something great"</span>
@@ -134,7 +133,6 @@
                         <span>● Ready to build</span>
                         <span>JavaScript</span>
                     </div>
-
                 </div>
             </div>
 
@@ -158,7 +156,7 @@
                 <article class="feature-card">
                     <div class="feature-icon">📁</div>
                     <h3>Project Management</h3>
-                    <p>Create, organize, update, and manage your programming projects in one place.</p>
+                    <p>Create, organize, update, and manage your programming projects.</p>
                     <a href="/projects.html" class="feature-link">Explore Projects →</a>
                 </article>
 
@@ -172,33 +170,31 @@
                 <article class="feature-card">
                     <div class="feature-icon">🌍</div>
                     <h3>Developer Community</h3>
-                    <p>Share programming knowledge, publish posts, comment, and interact with developers.</p>
+                    <p>Share programming knowledge and interact with developers.</p>
                     <a href="/community.html" class="feature-link">Join Community →</a>
                 </article>
 
                 <article class="feature-card">
                     <div class="feature-icon">👤</div>
                     <h3>Developer Profile</h3>
-                    <p>Create your profile, introduce yourself, and showcase your programming projects.</p>
+                    <p>Create your profile and showcase your programming projects.</p>
                     <a href="/profile.html" class="feature-link">View Profile →</a>
                 </article>
 
                 <article class="feature-card">
                     <div class="feature-icon">🔔</div>
                     <h3>Notifications</h3>
-                    <p>Stay informed about interactions and important community activity.</p>
+                    <p>Stay informed about important community activity.</p>
                     <a href="/dashboard.html" class="feature-link">Go to Dashboard →</a>
                 </article>
 
-                <!-- Hidden for logged-out users and normal Users -->
                 <article class="feature-card" id="adminFeatureCard" hidden>
                     <div class="feature-icon">🛡️</div>
                     <h3>Administration</h3>
-                    <p>
-                        Manage users, monitor platform activity,
-                        and manage authorized roles.
-                    </p>
-                    <a href="/admin.html" class="feature-link">Open Admin Panel →</a>
+                    <p>Manage users, monitor platform activity, and manage roles.</p>
+                    <a href="/admin.html" class="feature-link">
+                        Open Admin Dashboard →
+                    </a>
                 </article>
 
             </div>
@@ -208,10 +204,7 @@
     <section class="cta-section">
         <div class="container cta-content">
             <h2>Your Next Great Project Starts Here.</h2>
-            <p>
-                Create your account and start building your developer
-                journey with DeveloperHomes.
-            </p>
+            <p>Create your account and start building your developer journey.</p>
             <a href="/register.html" class="btn btn-primary btn-large">
                 Join DeveloperHomes →
             </a>
@@ -241,7 +234,7 @@
 
         <div class="footer-links">
             <h3>Account</h3>
-            <a href="/auth.html">Login</a>
+            <a href="/login.html">Login</a>
             <a href="/register.html">Register</a>
             <a href="/dashboard.html">Dashboard</a>
             <a href="/profile.html">Profile</a>
@@ -250,10 +243,7 @@
     </div>
 
     <div class="container footer-bottom">
-        <p>
-            © <span id="currentYear"></span> DeveloperHomes.
-            Built for developers.
-        </p>
+        <p>© <span id="currentYear"></span> DeveloperHomes. Built for developers.</p>
     </div>
 </footer>
 
