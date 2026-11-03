@@ -13,283 +13,249 @@
 
     <script src="/js/app.js" defer></script>
 </head>
-
 <body>
 
-    <!-- Navigation -->
-    <header class="site-header">
-        <nav class="navbar container" aria-label="Main navigation">
+<header class="site-header">
+    <nav class="navbar container" aria-label="Main navigation">
 
+        <a href="/" class="logo">
+            <span class="logo-icon">D</span>
+            <span>Developer<span class="logo-highlight">Homes</span></span>
+        </a>
+
+        <button class="menu-toggle" id="menuToggle"
+                aria-label="Toggle navigation" aria-expanded="false">
+            ☰
+        </button>
+
+        <div class="nav-links" id="navLinks">
+            <a href="/" class="nav-link active">Home</a>
+            <a href="/projects.html" class="nav-link">Projects</a>
+            <a href="/community.html" class="nav-link">Community</a>
+            <a href="/profile.html" class="nav-link">Profile</a>
+            <a href="/dashboard.html" class="nav-link">Dashboard</a>
+        </div>
+
+        <div class="nav-actions" id="navActions">
+            <a href="/auth.html" class="btn btn-outline">Login</a>
+            <a href="/register.html" class="btn btn-primary">Get Started</a>
+
+            <!-- Only Owner and Manager will see this button -->
+            <a href="/admin.html"
+               id="homeAdminButton"
+               class="btn btn-primary"
+               hidden>
+                Admin
+            </a>
+        </div>
+
+    </nav>
+</header>
+
+<main>
+
+    <section class="hero-section">
+        <div class="container hero-content">
+
+            <div class="hero-text">
+                <span class="hero-badge">🚀 Your developer community</span>
+
+                <h1>
+                    Build Your Ideas.
+                    <span class="text-gradient">Share Your Code.</span>
+                    Connect With Developers.
+                </h1>
+
+                <p>
+                    Welcome to DeveloperHomes, a platform where developers
+                    can create projects, write and share code, learn new
+                    technologies, and connect with a growing developer
+                    community.
+                </p>
+
+                <div class="hero-actions">
+                    <a href="/register.html" class="btn btn-primary btn-large">
+                        Create Free Account →
+                    </a>
+
+                    <a href="/projects.html" class="btn btn-outline btn-large">
+                        Explore Projects
+                    </a>
+                </div>
+
+                <div class="hero-note">
+                    <span>💻</span>
+                    <span>Learn • Build • Share • Grow</span>
+                </div>
+            </div>
+
+            <div class="hero-visual">
+                <div class="code-window">
+
+                    <div class="code-window-header">
+                        <div class="window-dots">
+                            <span></span><span></span><span></span>
+                        </div>
+                        <span>hello-developer.js</span>
+                    </div>
+
+                    <div class="code-content">
+                        <p><span class="code-purple">const</span> developer = {</p>
+                        <p class="code-indent">
+                            name: <span class="code-green">"Developer"</span>,
+                        </p>
+                        <p class="code-indent">
+                            passion: <span class="code-green">"Coding"</span>,
+                        </p>
+                        <p class="code-indent">
+                            skills: [
+                            <span class="code-green">"HTML"</span>,
+                            <span class="code-green">"CSS"</span>,
+                            <span class="code-green">"JavaScript"</span>
+                            ],
+                        </p>
+                        <p class="code-indent">
+                            goal: <span class="code-green">"Build something great"</span>
+                        </p>
+                        <p>};</p>
+                        <br>
+                        <p>
+                            <span class="code-purple">function</span>
+                            <span class="code-blue">startBuilding</span>() {
+                        </p>
+                        <p class="code-indent">
+                            <span class="code-purple">return</span>
+                            <span class="code-green">"Welcome to DeveloperHomes!"</span>;
+                        </p>
+                        <p>}</p>
+                    </div>
+
+                    <div class="code-window-footer">
+                        <span>● Ready to build</span>
+                        <span>JavaScript</span>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </section>
+
+    <section class="section features-section" id="features">
+        <div class="container">
+
+            <div class="section-heading">
+                <span class="section-label">WHAT YOU CAN DO</span>
+                <h2>Everything Developers Need</h2>
+                <p>
+                    Tools and features designed to help you develop,
+                    organize, and share your programming journey.
+                </p>
+            </div>
+
+            <div class="features-grid">
+
+                <article class="feature-card">
+                    <div class="feature-icon">📁</div>
+                    <h3>Project Management</h3>
+                    <p>Create, organize, update, and manage your programming projects in one place.</p>
+                    <a href="/projects.html" class="feature-link">Explore Projects →</a>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon">⌨️</div>
+                    <h3>Code Editor</h3>
+                    <p>Work with your code snippets and organize your programming ideas.</p>
+                    <a href="/editor.html" class="feature-link">Open Editor →</a>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon">🌍</div>
+                    <h3>Developer Community</h3>
+                    <p>Share programming knowledge, publish posts, comment, and interact with developers.</p>
+                    <a href="/community.html" class="feature-link">Join Community →</a>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon">👤</div>
+                    <h3>Developer Profile</h3>
+                    <p>Create your profile, introduce yourself, and showcase your programming projects.</p>
+                    <a href="/profile.html" class="feature-link">View Profile →</a>
+                </article>
+
+                <article class="feature-card">
+                    <div class="feature-icon">🔔</div>
+                    <h3>Notifications</h3>
+                    <p>Stay informed about interactions and important community activity.</p>
+                    <a href="/dashboard.html" class="feature-link">Go to Dashboard →</a>
+                </article>
+
+                <!-- Hidden for logged-out users and normal Users -->
+                <article class="feature-card" id="adminFeatureCard" hidden>
+                    <div class="feature-icon">🛡️</div>
+                    <h3>Administration</h3>
+                    <p>
+                        Manage users, monitor platform activity,
+                        and manage authorized roles.
+                    </p>
+                    <a href="/admin.html" class="feature-link">Open Admin Panel →</a>
+                </article>
+
+            </div>
+        </div>
+    </section>
+
+    <section class="cta-section">
+        <div class="container cta-content">
+            <h2>Your Next Great Project Starts Here.</h2>
+            <p>
+                Create your account and start building your developer
+                journey with DeveloperHomes.
+            </p>
+            <a href="/register.html" class="btn btn-primary btn-large">
+                Join DeveloperHomes →
+            </a>
+        </div>
+    </section>
+
+</main>
+
+<footer class="site-footer">
+    <div class="container footer-content">
+
+        <div class="footer-brand">
             <a href="/" class="logo">
                 <span class="logo-icon">D</span>
                 <span>Developer<span class="logo-highlight">Homes</span></span>
             </a>
-
-            <button class="menu-toggle"
-                    id="menuToggle"
-                    aria-label="Toggle navigation"
-                    aria-expanded="false">
-                ☰
-            </button>
-
-            <div class="nav-links" id="navLinks">
-                <a href="/" class="nav-link active">Home</a>
-                <a href="/projects.html" class="nav-link">Projects</a>
-                <a href="/community.html" class="nav-link">Community</a>
-                <a href="/profile.html" class="nav-link">Profile</a>
-                <a href="/dashboard.html" class="nav-link">Dashboard</a>
-            </div>
-
-            <div class="nav-actions">
-                <a href="/login.html" class="btn btn-outline">Login</a>
-                <a href="/register.html" class="btn btn-primary">Get Started</a>
-            </div>
-
-        </nav>
-    </header>
-
-    <main>
-
-        <!-- Hero Section -->
-        <section class="hero-section">
-            <div class="container hero-content">
-
-                <div class="hero-text">
-                    <span class="hero-badge">
-                        🚀 Your developer community
-                    </span>
-
-                    <h1>
-                        Build Your Ideas.
-                        <span class="text-gradient">Share Your Code.</span>
-                        Connect With Developers.
-                    </h1>
-
-                    <p>
-                        Welcome to DeveloperHomes, a platform where developers
-                        can create projects, write and share code, learn new
-                        technologies, and connect with a growing developer
-                        community.
-                    </p>
-
-                    <div class="hero-actions">
-                        <a href="/register.html" class="btn btn-primary btn-large">
-                            Create Free Account →
-                        </a>
-
-                        <a href="/projects.html" class="btn btn-outline btn-large">
-                            Explore Projects
-                        </a>
-                    </div>
-
-                    <div class="hero-note">
-                        <span>💻</span>
-                        <span>Learn • Build • Share • Grow</span>
-                    </div>
-                </div>
-
-                <div class="hero-visual">
-                    <div class="code-window">
-
-                        <div class="code-window-header">
-                            <div class="window-dots">
-                                <span></span>
-                                <span></span>
-                                <span></span>
-                            </div>
-                            <span>hello-developer.js</span>
-                        </div>
-
-                        <div class="code-content">
-                            <p><span class="code-purple">const</span> developer = {</p>
-                            <p class="code-indent">
-                                name: <span class="code-green">"Developer"</span>,
-                            </p>
-                            <p class="code-indent">
-                                passion: <span class="code-green">"Coding"</span>,
-                            </p>
-                            <p class="code-indent">
-                                skills: [
-                                <span class="code-green">"HTML"</span>,
-                                <span class="code-green">"CSS"</span>,
-                                <span class="code-green">"JavaScript"</span>
-                                ],
-                            </p>
-                            <p class="code-indent">
-                                goal: <span class="code-green">"Build something great"</span>
-                            </p>
-                            <p>};</p>
-                            <br>
-                            <p>
-                                <span class="code-purple">function</span>
-                                <span class="code-blue">startBuilding</span>() {
-                            </p>
-                            <p class="code-indent">
-                                <span class="code-purple">return</span>
-                                <span class="code-green">"Welcome to DeveloperHomes!"</span>;
-                            </p>
-                            <p>}</p>
-                        </div>
-
-                        <div class="code-window-footer">
-                            <span>● Ready to build</span>
-                            <span>JavaScript</span>
-                        </div>
-
-                    </div>
-                </div>
-
-            </div>
-        </section>
-
-        <!-- Features -->
-        <section class="section features-section" id="features">
-            <div class="container">
-
-                <div class="section-heading">
-                    <span class="section-label">WHAT YOU CAN DO</span>
-                    <h2>Everything Developers Need</h2>
-                    <p>
-                        Tools and features designed to help you develop,
-                        organize, and share your programming journey.
-                    </p>
-                </div>
-
-                <div class="features-grid">
-
-                    <article class="feature-card">
-                        <div class="feature-icon">📁</div>
-                        <h3>Project Management</h3>
-                        <p>
-                            Create, organize, update, and manage your
-                            programming projects in one place.
-                        </p>
-                        <a href="/projects.html" class="feature-link">
-                            Explore Projects →
-                        </a>
-                    </article>
-
-                    <article class="feature-card">
-                        <div class="feature-icon">⌨️</div>
-                        <h3>Code Editor</h3>
-                        <p>
-                            Work with your code snippets and organize
-                            your programming ideas.
-                        </p>
-                        <a href="/editor.html" class="feature-link">
-                            Open Editor →
-                        </a>
-                    </article>
-
-                    <article class="feature-card">
-                        <div class="feature-icon">🌍</div>
-                        <h3>Developer Community</h3>
-                        <p>
-                            Share programming knowledge, publish posts,
-                            comment, and interact with developers.
-                        </p>
-                        <a href="/community.html" class="feature-link">
-                            Join Community →
-                        </a>
-                    </article>
-
-                    <article class="feature-card">
-                        <div class="feature-icon">👤</div>
-                        <h3>Developer Profile</h3>
-                        <p>
-                            Create your profile, introduce yourself,
-                            and showcase your programming projects.
-                        </p>
-                        <a href="/profile.html" class="feature-link">
-                            View Profile →
-                        </a>
-                    </article>
-
-                    <article class="feature-card">
-                        <div class="feature-icon">🔔</div>
-                        <h3>Notifications</h3>
-                        <p>
-                            Stay informed about interactions and
-                            important community activity.
-                        </p>
-                        <a href="/dashboard.html" class="feature-link">
-                            Go to Dashboard →
-                        </a>
-                    </article>
-
-                    <article class="feature-card">
-                        <div class="feature-icon">🛡️</div>
-                        <h3>Administration</h3>
-                        <p>
-                            Authorized administrators can manage users,
-                            monitor platform activity, and manage roles.
-                        </p>
-                        <a href="/login.html" class="feature-link">
-                            Admin Login →
-                        </a>
-                    </article>
-
-                </div>
-            </div>
-        </section>
-
-        <!-- Call to Action -->
-        <section class="cta-section">
-            <div class="container cta-content">
-                <h2>Your Next Great Project Starts Here.</h2>
-                <p>
-                    Create your account and start building your developer
-                    journey with DeveloperHomes.
-                </p>
-                <a href="/register.html" class="btn btn-primary btn-large">
-                    Join DeveloperHomes →
-                </a>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Footer -->
-    <footer class="site-footer">
-        <div class="container footer-content">
-
-            <div class="footer-brand">
-                <a href="/" class="logo">
-                    <span class="logo-icon">D</span>
-                    <span>Developer<span class="logo-highlight">Homes</span></span>
-                </a>
-
-                <p>
-                    A home for developers to learn, build, share,
-                    and connect.
-                </p>
-            </div>
-
-            <div class="footer-links">
-                <h3>Explore</h3>
-                <a href="/">Home</a>
-                <a href="/projects.html">Projects</a>
-                <a href="/community.html">Community</a>
-                <a href="/editor.html">Code Editor</a>
-            </div>
-
-            <div class="footer-links">
-                <h3>Account</h3>
-                <a href="/login.html">Login</a>
-                <a href="/register.html">Register</a>
-                <a href="/dashboard.html">Dashboard</a>
-                <a href="/profile.html">Profile</a>
-            </div>
-
+            <p>A home for developers to learn, build, share, and connect.</p>
         </div>
 
-        <div class="container footer-bottom">
-            <p>
-                © <span id="currentYear"></span> DeveloperHomes.
-                Built for developers.
-            </p>
+        <div class="footer-links">
+            <h3>Explore</h3>
+            <a href="/">Home</a>
+            <a href="/projects.html">Projects</a>
+            <a href="/community.html">Community</a>
+            <a href="/editor.html">Code Editor</a>
         </div>
-    </footer>
+
+        <div class="footer-links">
+            <h3>Account</h3>
+            <a href="/auth.html">Login</a>
+            <a href="/register.html">Register</a>
+            <a href="/dashboard.html">Dashboard</a>
+            <a href="/profile.html">Profile</a>
+        </div>
+
+    </div>
+
+    <div class="container footer-bottom">
+        <p>
+            © <span id="currentYear"></span> DeveloperHomes.
+            Built for developers.
+        </p>
+    </div>
+</footer>
 
 </body>
 </html>
