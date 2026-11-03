@@ -1,53 +1,26 @@
 
 "use strict";
 
-// =============================================
-// DeveloperHomes - Admin Access Middleware
-// =============================================
-
-function isApiRequest(req) {
-    return req.originalUrl.startsWith("/api/");
-}
-
-// Require any logged-in account
+// Require logged-in user
 function requireAuth(req, res, next) {
     if (!req.session || !req.session.user) {
-        if (isApiRequest(req)) {
-            return res.status(401).json({
-                success: false,
-                message: "Please log in first."
-            });
-        }
-
-        return res.redirect("/auth.html");
+        return res.redirect("/login.html");
     }
 
     next();
 }
 
-// Allow only Owner and Manager
+// Allow Owner and Manager only
 function requireAdmin(req, res, next) {
     if (!req.session || !req.session.user) {
-        if (isApiRequest(req)) {
-            return res.status(401).json({
-                success: false,
-                message: "Please log in first."
-            });
-        }
-
-        return res.redirect("/auth.html");
+        return res.redirect("/login.html");
     }
 
-    const role = String(req.session.user.role || "").toLowerCase();
+    const role = String(req.session.user.role || "")
+        .trim()
+        .toLowerCase();
 
-    if (role !== "owner" && role !== "manager") {
-        if (isApiRequest(req)) {
-            return res.status(403).json({
-                success: false,
-                message: "Only Owner and Manager accounts can access this resource."
-            });
-        }
-
+    if (!["owner", "manager"].includes(role)) {
         return res.status(403).send(`
             <!DOCTYPE html>
             <html lang="en">
@@ -66,7 +39,6 @@ function requireAdmin(req, res, next) {
                         font-family: Arial, sans-serif;
                         text-align: center;
                     }
-
                     .box {
                         max-width: 420px;
                         margin: 20px;
@@ -74,7 +46,6 @@ function requireAdmin(req, res, next) {
                         background: #1e293b;
                         border-radius: 18px;
                     }
-
                     a {
                         display: inline-block;
                         margin-top: 15px;
@@ -90,8 +61,7 @@ function requireAdmin(req, res, next) {
                 <div class="box">
                     <h1>Access Denied 🔒</h1>
                     <p>
-                        This management page is only available
-                        to Owner and Manager accounts.
+                        This page is available only to Manager and Owner accounts.
                     </p>
                     <a href="/dashboard.html">Return to Dashboard</a>
                 </div>
@@ -103,7 +73,7 @@ function requireAdmin(req, res, next) {
     next();
 }
 
-// Allow Owner only
+// Owner-only actions
 function requireOwner(req, res, next) {
     if (!req.session || !req.session.user) {
         return res.status(401).json({
@@ -112,7 +82,9 @@ function requireOwner(req, res, next) {
         });
     }
 
-    const role = String(req.session.user.role || "").toLowerCase();
+    const role = String(req.session.user.role || "")
+        .trim()
+        .toLowerCase();
 
     if (role !== "owner") {
         return res.status(403).json({
