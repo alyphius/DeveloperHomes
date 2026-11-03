@@ -1,3 +1,6 @@
+
+"use strict";
+
 // =============================================
 // DeveloperHomes - Main Server
 // =============================================
@@ -39,48 +42,42 @@ app.disable("x-powered-by");
 // Request body configuration
 app.use(express.json({ limit: "2mb" }));
 
-app.use(
-    express.urlencoded({
-        extended: true,
-        limit: "2mb"
-    })
-);
+app.use(express.urlencoded({
+    extended: true,
+    limit: "2mb"
+}));
 
 // =============================================
 // SESSION CONFIGURATION
 // =============================================
 
 if (!process.env.SESSION_SECRET) {
-    throw new Error(
-        "SESSION_SECRET environment variable is missing"
-    );
+    throw new Error("SESSION_SECRET environment variable is missing");
 }
 
-app.use(
-    session({
-        name: "developerhomes.sid",
+app.use(session({
+    name: "developerhomes.sid",
+    secret: process.env.SESSION_SECRET,
+    resave: false,
+    saveUninitialized: false,
 
-        secret: process.env.SESSION_SECRET,
-
-        resave: false,
-
-        saveUninitialized: false,
-
-        cookie: {
-            httpOnly: true,
-            secure: process.env.NODE_ENV === "production",
-            sameSite: "lax",
-            maxAge: 1000 * 60 * 60 * 24
-        }
-    })
-);
+    cookie: {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === "production",
+        sameSite: "lax",
+        maxAge: 1000 * 60 * 60 * 24
+    }
+}));
 
 // =============================================
 // API ROUTES
 // =============================================
 
 app.use("/api/auth", authRoutes);
+
+// Admin API routes must enforce authorization
 app.use("/api/admin", adminRoutes);
+
 app.use("/api/projects", projectRoutes);
 app.use("/api/posts", postRoutes);
 app.use("/api/users", userRoutes);
@@ -99,13 +96,11 @@ app.get("/api/health", (req, res) => {
 });
 
 // =============================================
-// PROTECTED OWNER / MANAGER DASHBOARD
-// IMPORTANT: This must be BEFORE express.static
+// PROTECTED ADMIN DASHBOARD
+// MUST BE BEFORE express.static()
 // =============================================
 
 app.get("/admin.html", requireAdmin, (req, res) => {
-
-    // Prevent browser caching of private admin content
     res.set({
         "Cache-Control": "no-store, no-cache, must-revalidate, private",
         "Pragma": "no-cache",
@@ -121,20 +116,14 @@ app.get("/admin.html", requireAdmin, (req, res) => {
 // SERVE PUBLIC FRONTEND
 // =============================================
 
-app.use(
-    express.static(
-        path.join(__dirname, "public")
-    )
-);
+app.use(express.static(path.join(__dirname, "public")));
 
 // =============================================
 // MAIN PAGE
 // =============================================
 
 app.get("/", (req, res) => {
-    res.sendFile(
-        path.join(__dirname, "public", "index.html")
-    );
+    res.sendFile(path.join(__dirname, "public", "index.html"));
 });
 
 // =============================================
@@ -157,10 +146,9 @@ app.use((err, req, res, next) => {
 
     res.status(err.status || 500).json({
         success: false,
-        message:
-            process.env.NODE_ENV === "production"
-                ? "An unexpected server error occurred"
-                : err.message
+        message: process.env.NODE_ENV === "production"
+            ? "An unexpected server error occurred"
+            : err.message
     });
 });
 
@@ -200,7 +188,6 @@ async function startServer() {
     }
 }
 
-// Start only when executed directly
 if (require.main === module) {
     startServer();
 }
